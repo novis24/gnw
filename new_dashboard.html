@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Academic Management System</title>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #3f37c9;
+            --accent: #4895ef;
+            --danger: #f72585;
+            --success: #4cc9f0;
+            --warning: #f8961e;
+            --info: #577590;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --gray-light: #e9ecef;
+            
+            --border-radius: 0.375rem;
+            --box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background-color: #f5f7fa;
+        }
+
+        /* Layout */
+        .app-container {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            grid-template-rows: 60px 1fr;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .app-header {
+            grid-column: 1 / -1;
+            background-color: white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            padding: 0 1.5rem;
+            z-index: 10;
+        }
+
+        .logo {
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-icon {
+            margin-right: 0.5rem;
+            font-size: 1.5rem;
+        }
+
+        .header-actions {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--gray-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        /* Sidebar */
+        .app-sidebar {
+            background-color: white;
+            border-right: 1px solid #e9ecef;
+            padding: 1rem 0;
+            overflow-y: auto;
+        }
+
+        .sidebar-nav {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin-bottom: 0.25rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            color: var(--gray);
+            text-decoration: none;
+            transition: var(--transition);
+            border-left: 3px solid transparent;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--primary);
+            background-color: rgba(67, 97, 238, 0.1);
+            border-left-color: var(--primary);
+        }
+
+        .nav-link.active {
+            font-weight: 500;
+        }
+
+        .nav-icon {
+            margin-right: 0.75rem;
+            font-size: 1.1rem;
+        }
+
+        /* Main Content */
+        .app-main {
+            padding: 1.5rem;
+            overflow-y: auto;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .page-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        /* Cards */
+        .card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--gray-light);
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius);
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            font-size: 0.875rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--gray);
+            color: var(--gray);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--gray-light);
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #e5177b;
+        }
+
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+        }
+
+        .btn-icon {
+            margin-right: 0.5rem;
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--gray-light);
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+            font-size: 0.875rem;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.2rem rgba(67, 97, 238, 0.25);
+        }
+
+        .form-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 16px 12px;
+        }
+
+        /* Tables */
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+
+        .table th {
+            background-color: var(--gray-light);
+            padding: 0.75rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--gray);
+        }
+
+        .table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--gray-light);
+            vertical-align: middle;
+        }
+
+        .table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .table tr:hover td {
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+
+        .table-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            line-height: 1;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: baseline;
+            border-radius: 10rem;
+        }
+
+        .badge-primary {
+            background-color: rgba(67, 97, 238, 0.1);
+            color: var(--primary);
+        }
+
+        .badge-success {
+            background-color: rgba(76, 201, 240, 0.1);
+            color: var(--success);
+        }
+
+        .badge-warning {
+            background-color: rgba(248, 150, 30, 0.1);
+            color: var(--warning);
+        }
+
+        .badge-danger {
+            background-color: rgba(247, 37, 133, 0.1);
+            color: var(--danger);
+        }
+
+        /* Tabs */
+        .nav-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--gray-light);
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-tab {
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--gray);
+            border-bottom: 2px solid transparent;
+            transition: var(--transition);
+        }
+
+        .nav-tab:hover {
+            color: var(--primary);
+        }
+
+        .nav-tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Grid */
+        .grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .grid-cols-2 {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .grid-cols-3 {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .grid-cols-4 {
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        /* Utility Classes */
+        .text-muted {
+            color: var(--gray);
+        }
+
+        .text-sm {
+            font-size: 0.875rem;
+        }
+
+        .text-xs {
+            font-size: 0.75rem;
+        }
+
+        .font-semibold {
+            font-weight: 600;
+        }
+
+        .mb-1 {
+            margin-bottom: 0.25rem;
+        }
+
+        .mb-2 {
+            margin-bottom: 0.5rem;
+        }
+
+        .mb-3 {
+            margin-bottom: 1rem;
+        }
+
+        .mb-4 {
+            margin-bottom: 1.5rem;
+        }
+
+        .mt-2 {
+            margin-top: 0.5rem;
+        }
+
+        .mt-3 {
+            margin-top: 1rem;
+        }
+
+        .gap-2 {
+            gap: 0.5rem;
+        }
+
+        .gap-3 {
+            gap: 1rem;
+        }
+
+        .w-full {
+            width: 100%;
+        }
+
+        .flex {
+            display: flex;
+        }
+
+        .items-center {
+            align-items: center;
+        }
+
+        .justify-between {
+            justify-content: space-between;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .app-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .app-sidebar {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .grid-cols-2, .grid-cols-3, .grid-cols-4 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <div class="logo">
+                <span class="logo-icon">📚</span>
+                <span>AcademicPro</span>
+            </div>
+            <div class="header-actions">
+                <div class="user-profile">
+                    <div class="avatar">AD</div>
+                    <span class="text-sm font-semibold">Admin</span>
+                </div>
+            </div>
+        </header>
+
+        <aside class="app-sidebar">
+            <nav>
+                <ul class="sidebar-nav">
+                    <li class="nav-item">
+                        <a href="#dashboard" class="nav-link active">
+                            <span class="nav-icon">📊</span>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#students" class="nav-link">
+                            <span class="nav-icon">👨‍🎓</span>
+                            Students
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#teachers" class="nav-link">
+                            <span class="nav-icon">👩‍🏫</span>
+                            Teachers
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#classes" class="nav-link">
+                            <span class="nav-icon">🏫</span>
+                            Classes
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#subjects" class="nav-link">
+                            <span class="nav-icon">📖</span>
+                            Subjects
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#streams" class="nav-link">
+                            <span class="nav-icon">🔀</span>
+                            Streams
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#departments" class="nav-link">
+                            <span class="nav-icon">🏢</span>
+                            Departments
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#calendar" class="nav-link">
+                            <span class="nav-icon">📅</span>
+                            Calendar
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#reports" class="nav-link">
+                            <span class="nav-icon">📈</span>
+                            Reports
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#parents" class="nav-link">
+                            <span class="nav-icon">👪</span>
+                            Parents
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#settings" class="nav-link">
+                            <span class="nav-icon">⚙️</span>
+                            Settings
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="app-main">
+            <!-- Dashboard Tab -->
+            <div id="dashboard" class="tab-content active">
+                <div class="page-header">
+                    <h1 class="page-title">Dashboard Overview</h1>
+                    <div class="page-actions">
+                        <button class="btn btn-outline">
+                            <span class="btn-icon">🔄</span>
+                            Refresh
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-4 gap-3 mb-4">
+                    <div class="card">
+                        <h3 class="card-title">Total Students</h3>
+                        <p class="text-2xl font-semibold">1,245</p>
+                        <p class="text-sm text-muted mt-2">↑ 5.2% from last term</p>
+                    </div>
+                    <div class="card">
+                        <h3 class="card-title">Active Teachers</h3>
+                        <p class="text-2xl font-semibold">87</p>
+                        <p class="text-sm text-muted mt-2">↑ 2.3% from last term</p>
+                    </div>
+                    <div class="card">
+                        <h3 class="card-title">Classes Running</h3>
+                        <p class="text-2xl font-semibold">156</p>
+                        <p class="text-sm text-muted mt-2">↓ 1.1% from last term</p>
+                    </div>
+                    <div class="card">
+                        <h3 class="card-title">Avg. GPA</h3>
+                        <p class="text-2xl font-semibold">3.42</p>
+                        <p class="text-sm text-muted mt-2">↑ 0.15 from last term</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-3 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Recent Activities</h3>
+                            <button class="btn btn-sm btn-outline">View All</button>
+                        </div>
+                        <table class="table">
+                            <tbody>
+                                <tr>
+                                    <td class="text-sm">Grade submission for Math 101</td>
+                                    <td class="text-sm text-muted">Today</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-sm">New student registration</td>
+                                    <td class="text-sm text-muted">2 days ago</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-sm">Class schedule updated</td>
+                                    <td class="text-sm text-muted">3 days ago</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Upcoming Events</h3>
+                            <button class="btn btn-sm btn-outline">View Calendar</button>
+                        </div>
+                        <table class="table">
+                            <tbody>
+                                <tr>
+                                    <td class="text-sm">Parent-Teacher Meeting</td>
+                                    <td class="text-sm text-muted">May 20, 2023</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-sm">Midterm Exams</td>
+                                    <td class="text-sm text-muted">May 25, 2023</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-sm">Sports Day</td>
+                                    <td class="text-sm text-muted">June 5, 2023</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Quick Actions</h3>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button class="btn btn-sm btn-outline">Add Student</button>
+                            <button class="btn btn-sm btn-outline">Create Class</button>
+                            <button class="btn btn-sm btn-outline">Enter Grades</button>
+                            <button class="btn btn-sm btn-outline">Generate Report</button>
+                            <button class="btn btn-sm btn-outline">Schedule Event</button>
+                            <button class="btn btn-sm btn-outline">View Statistics</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Students Tab -->
+            <div id="students" class="tab-content">
+                <div class="page-header">
+                    <h1 class="page-title">Student Management</h1>
+                    <div class="page-actions">
+                        <button class="btn btn-primary">
+                            <span class="btn-icon">➕</span>
+                            Add Student
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h3 class="card-title">Student Records</h3>
+                        <div class="flex items-center gap-2">
+                            <input type="text" class="form-control" placeholder="Search students..." style="width: 200px;">
+                            <button class="btn btn-outline">Filter</button>
+                            <button class="btn btn-outline">Export</button>
+                        </div>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Student ID</th>
+                                <th>Name</th>
+                                <th>Class</th>
+                                <th>Contact</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>ST1001</td>
+                                <td>
+                                    <div class="font-semibold">John Doe</div>
+                                    <div class="text-xs text-muted">Grade 10</div>
+                                </td>
+                                <td>10A</td>
+                                <td>john.doe@example.com</td>
+                                <td><span class="badge badge-success">Active</span></td>
+                                <td>
+                                    <div class="table-actions">
+                                        <button class="btn btn-sm btn-outline">View</button>
+                                        <button class="btn btn-sm btn-outline">Edit</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>ST1002</td>
+                                <td>
+                                    <div class="font-semibold">Jane Smith</div>
+                                    <div class="text-xs text-muted">Grade 11</div>
+                                </td>
+                                <td>11B</td>
+                                <td>jane.smith@example.com</td>
+                                <td><span class="badge badge-success">Active</span></td>
+                                <td>
+                                    <div class="table-actions">
+                                        <button class="btn btn-sm btn-outline">View</button>
+                                        <button class="btn btn-sm btn-outline">Edit</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Student Details</h3>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Student ID</label>
+                            <input type="text" class="form-control" value="ST1001" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" class="form-control" value="John Doe">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Date of Birth</label>
+                            <input type="date" class="form-control" value="2005-03-15">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Class/Grade</label>
+                            <select class="form-control form-select">
+                                <option>10A</option>
+                                <option>10B</option>
+                                <option>11A</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Contact & Medical Information</h3>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" value="john.doe@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Phone</label>
+                            <input type="tel" class="form-control" value="+1234567890">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Emergency Contact</label>
+                            <input type="text" class="form-control" value="Jane Doe (Mother) +1987654321">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Medical Information</label>
+                            <textarea class="form-control" rows="2">No known allergies</textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Teachers Tab -->
+            <div id="teachers" class="tab-content">
+                <div class="page-header">
+                    <h1 class="page-title">Teacher Management</h1>
+                    <div class="page-actions">
+                        <button class="btn btn-primary">
+                            <span class="btn-icon">➕</span>
+                            Add Teacher
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h3 class="card-title">Teacher Records</h3>
+                        <div class="flex items-center gap-2">
+                            <input type="text" class="form-control" placeholder="Search teachers..." style="width: 200px;">
+                            <button class="btn btn-outline">Filter</button>
+                        </div>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Teacher ID</th>
+                                <th>Name</th>
+                                <th>Department</th>
+                                <th>Subjects</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>TC1001</td>
+                                <td>
+                                    <div class="font-semibold">Prof. Sarah Johnson</div>
+                                    <div class="text-xs text-muted">sarah.j@example.com</div>
+                                </td>
+                                <td>Mathematics</td>
+                                <td>Math, Calculus</td>
+                                <td><span class="badge badge-success">Active</span></td>
+                                <td>
+                                    <div class="table-actions">
+                                        <button class="btn btn-sm btn-outline">View</button>
+                                        <button class="btn btn-sm btn-outline">Edit</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>TC1002</td>
+                                <td>
+                                    <div class="font-semibold">Dr. Michael Brown</div>
+                                    <div class="text-xs text-muted">michael.b@example.com</div>
+                                </td>
+                                <td>Science</td>
+                                <td>Physics, Chemistry</td>
+                                <td><span class="badge badge-success">Active</span></td>
+                                <td>
+                                    <div class="table-actions">
+                                        <button class="btn btn-sm btn-outline">View</button>
+                                        <button class="btn btn-sm btn-outline">Edit</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Classes Tab -->
+            <div id="classes" class="tab-content">
+                <div class="page-header">
+                    <h1 class="page-title">Class Management</h1>
+                    <div class="page-actions">
+                        <button class="btn btn-primary">
+                            <span class="btn-icon">➕</span>
+                            Create Class
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h3 class="card-title">Class Schedule</h3>
+                        <div class="flex items-center gap-2">
+                            <select class="form-control form-select" style="width: 150px;">
+                                <option>All Streams</option>
+                                <option>Science</option>
+                                <option>Arts</option>
+                            </select>
+                            <button class="btn btn-outline">Generate Timetable</button>
+                        </div>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Class ID</th>
+                                <th>Name</th>
+                                <th>Stream</th>
+                                <th>Teacher</th>
+                                <th>Schedule</th>
+                                <th>Students</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>CL101</td>
+                                <td>10A Mathematics</td>
+                                <td>Science</td>
+                                <td>Prof. Sarah Johnson</td>
+                                <td>Mon/Wed 9:00-10:30</td>
+                                <td>32</td>
+                                <td>
+                                    <div class="table-actions">
+                                        <button class="btn btn-sm btn-outline">View</button>
+                                        <button class="btn btn-sm btn-outline">Edit</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>CL102</td>
+                                <td>10B Physics</td>
+                                <td>Science</td>
+                                <td>Dr. Michael Brown</td>
+                                <td>Tue/Thu 11:00-12:30</td>
+                                <td>28</td>
+                                <td>
+                                    <div class="table-actions">
+                                        <button class="btn btn-sm btn-outline">View</button>
+                                        <button class="btn btn-sm btn-outline">Edit</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Subjects Tab -->
+            <div id="subjects" class="tab-content">
+                <div class="page-header">
+                    <h1 class="page-title">Subject Management</h1>
+                    <div class="page-actions">
+                        <button class="btn btn-primary">
+                            <span class="btn-icon">➕</span>
+                            Add Subject
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Subject ID</th>
+                                <th>Name</th>
+                                <th>Description</th>
+                                <th>Department</th>
+                                <th>Classes</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>SB101</td>
+                                <td>Mathematics</td>
+                                <td>Core mathematics curriculum</td>
+                                <td>Math</td>
+                                <td>12</td>
+                                <td>
+                                    <div class="table-actions">
+                                        <button class="btn btn-sm btn-outline">View</button>
+                                        <button class="btn btn-sm btn-outline">Edit</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>SB102</td>
+                                <td>Physics</td>
+                                <td>Fundamentals of physics</td>
+                                <td>Science</td>
+                                <td>8</td>
+                                <td>
+                                    <div class="table-actions">
+                                        <button class="btn btn-sm btn-outline">View</button>
+                                        <button class="btn btn-sm btn-outline">Edit</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Streams Tab -->
+            <div id="streams" class="tab-content">
+                <div class="page-header">
+                    <h1 class="page-title">Stream Management</h1>
+                    <div class="page-actions">
+                        <button class="btn btn-primary">
+                            <span class="btn-icon">➕</span>
+                            Add Stream
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Stream ID</th>
+                                <th>Name</th>
+                                <th>Description</th>
+                                <th>Classes</th>
+                                <th>Students</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>ST101</td>
+                                <td>Science</td>
+                                <td>Science stream with physics, chemistry, biology</td>
+                                <td>24</td>
+                                <td>320</td>
+                                <td>
+                                    <div class="table-actions">
+                                        <button class="btn btn-sm btn-outline">View</button>
+                                        <button class="btn btn-sm btn-outline">Edit</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>ST102</td>
+                                <td>Arts</td>
+                                <td>Arts stream with literature, history, languages</td>
+                                <td>18</td>
+                                <td>240</td>
+                                <td>
+                                    <div class="table-actions">
+                                        <button class="btn btn-sm btn-outline">View</button>
+                                        <button class="btn btn-sm btn-outline">Edit</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Departments Tab -->
+            <div id="departments" class="tab-content">
+                <div class="page-header">
+                    <h1 class="page-title">Department Management</h1>
+                    <div class="page-actions">
+                        <button class="btn btn-primary">
+                            <span class="btn-icon">➕</span>
+                            Add Department
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Dept. ID</th>
+                                <th>Name</th>
+                                <th>Head</th>
+                                <th>Teachers</th>
+                                <th>Subjects</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>DP101</td>
+                                <td>Mathematics</td>
+                                <td>Prof. Sarah Johnson</td>
+                                <td>12</td>
+                                <td>6</td>
+                                <td>
+                                    <div class="table-actions">
+                                        <button class="btn btn-sm btn-outline">View</button>
+                                        <button class="btn btn-sm btn-outline">Edit</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>DP102</td>
+                                <td>Science</td>
+                                <td>Dr. Michael Brown</td>
+                                <td>15</td>
+                                <td>8</td>
+                                <td>
+                                    <div class="table-actions">
+                                        <button class="btn btn-sm btn-outline">View</button>
+                                        <button class="btn btn-sm btn-outline">Edit</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Calendar Tab -->
+            <div id="calendar" class="tab-content">
+                <div class="page-header">
+                    <h1 class="page-title">Academic Calendar</h1>
+                    <div class="page-actions">
+                        <button class="btn btn-primary">
+                            <span class="btn-icon">➕</span>
+                            Add Event
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h3 class="card-title">Upcoming Events</h3>
+                        <div class="flex items-center gap-2">
+                            <select class="form-control form-select" style="width: 150px;">
+                                <option>This Month</option>
+                                <option>Next Month</option>
+                                <option>This Term</option>
+                            </select>
+                        </div>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Event</th>
+                                <th>Description</th>
+                                <th>Location</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>May 20, 2023</td>
+                                <td>Parent-Teacher Meeting</td>
+                                <td>Quarterly meeting with parents</td>
+                                <td>Main Hall</td>
+                                <td>
+                                    <div class="table-actions">
+                                        <button class="btn btn-sm btn-outline">View</button>
+                                        <button class="btn btn-sm btn-outline">Edit</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>    

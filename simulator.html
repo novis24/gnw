@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Physics E-Lab: Projectile Motion Simulator</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2980b9;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: var(--dark-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            border-radius: var(--border-radius);
+            margin-bottom: 30px;
+            box-shadow: var(--box-shadow);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .lab-container {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+        }
+
+        .control-panel {
+            background-color: white;
+            padding: 25px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        .simulation-area {
+            background-color: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            position: relative;
+            min-height: 500px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            -webkit-appearance: none;
+            background: #ddd;
+            border-radius: 4px;
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .value-display {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: var(--transition);
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .btn-reset {
+            background-color: var(--accent-color);
+            margin-top: 15px;
+        }
+
+        .btn-reset:hover {
+            background-color: #c0392b;
+        }
+
+        .canvas-container {
+            position: relative;
+            width: 100%;
+            height: 450px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+
+        canvas {
+            background-color: #f9f9f9;
+        }
+
+        .ground {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 20px;
+            background-color: #8b4513;
+        }
+
+        .projectile {
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            background-color: var(--accent-color);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .data-panel {
+            margin-top: 30px;
+            background-color: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .data-item {
+            background-color: var(--light-color);
+            padding: 15px;
+            border-radius: var(--border-radius);
+            text-align: center;
+        }
+
+        .data-label {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .data-value {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--dark-color);
+        }
+
+        .unit {
+            font-size: 0.9rem;
+            color: #666;
+            margin-left: 3px;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .lab-container {
+                grid-template-columns: 1fr;
+            }
+
+            .data-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .data-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Animation for projectile */
+        @keyframes projectileMotion {
+            0% {
+                transform: translate(0, 0);
+            }
+            100% {
+                transform: translate(var(--end-x), var(--end-y));
+            }
+        }
+
+        /* Tooltip styles */
+        .tooltip {
+            position: absolute;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            pointer-events: none;
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Physics E-Lab</h1>
+            <p class="subtitle">Projectile Motion Simulator</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="lab-container">
+            <div class="control-panel">
+                <h2>Control Panel</h2>
+                <div class="form-group">
+                    <label for="velocity">Initial Velocity (m/s)</label>
+                    <input type="range" id="velocity" min="1" max="50" value="20" step="1">
+                    <div class="value-display">
+                        <span>1 m/s</span>
+                        <span id="velocity-value">20 m/s</span>
+                        <span>50 m/s</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="angle">Launch Angle (degrees)</label>
+                    <input type="range" id="angle" min="0" max="90" value="45" step="1">
+                    <div class="value-display">
+                        <span>0°</span>
+                        <span id="angle-value">45°</span>
+                        <span>90°</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="gravity">Gravity (m/s²)</label>
+                    <input type="range" id="gravity" min="1" max="20" value="9.8" step="0.1">
+                    <div class="value-display">
+                        <span>1 m/s²</span>
+                        <span id="gravity-value">9.8 m/s²</span>
+                        <span>20 m/s²</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="height">Initial Height (m)</label>
+                    <input type="range" id="height" min="0" max="100" value="0" step="1">
+                    <div class="value-display">
+                        <span>0 m</span>
+                        <span id="height-value">0 m</span>
+                        <span>100 m</span>
+                    </div>
+                </div>
+
+                <button id="btn-launch">Launch Projectile</button>
+                <button id="btn-reset" class="btn-reset">Reset Simulation</button>
+            </div>
+
+            <div class="simulation-area">
+                <h2>Simulation</h2>
+                <div class="canvas-container">
+                    <canvas id="simulationCanvas" width="700" height="450"></canvas>
+                    <div class="ground"></div>
+                    <div class="projectile" id="projectile" style="display: none;"></div>
+                    <div class="tooltip" id="tooltip"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="data-panel">
+            <h2>Simulation Data</h2>
+            <div class="data-grid">
+                <div class="data-item">
+                    <div class="data-label">Maximum Height</div>
+                    <div class="data-value" id="max-height">0 <span class="unit">m</span></div>
+                </div>
+                <div class="data-item">
+                    <div class="data-label">Range</div>
+                    <div class="data-value" id="range">0 <span class="unit">m</span></div>
+                </div>
+                <div class="data-item">
+                    <div class="data-label">Flight Time</div>
+                    <div class="data-value" id="flight-time">0 <span class="unit">s</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>Physics E-Lab &copy; 2023 | Projectile Motion Simulator | Educational Purposes Only</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM elements
+            const velocitySlider = document.getElementById('velocity');
+            const angleSlider = document.getElementById('angle');
+            const gravitySlider = document.getElementById('gravity');
+            const heightSlider = document.getElementById('height');
+            const velocityValue = document.getElementById('velocity-value');
+            const angleValue = document.getElementById('angle-value');
+            const gravityValue = document.getElementById('gravity-value');
+            const heightValue = document.getElementById('height-value');
+            const btnLaunch = document.getElementById('btn-launch');
+            const btnReset = document.getElementById('btn-reset');
+            const maxHeightDisplay = document.getElementById('max-height');
+            const rangeDisplay = document.getElementById('range');
+            const flightTimeDisplay = document.getElementById('flight-time');
+            const canvas = document.getElementById('simulationCanvas');
+            const ctx = canvas.getContext('2d');
+            const projectile = document.getElementById('projectile');
+            const tooltip = document.getElementById('tooltip');
+
+            // Simulation variables
+            let animationId = null;
+            let isSimulating = false;
+            const scale = 5; // pixels per meter
+            const origin = { x: 50, y: canvas.height - 20 };
+
+            // Update displayed values when sliders change
+            velocitySlider.addEventListener('input', function() {
+                velocityValue.textContent = this.value + ' m/s';
+            });
+
+            angleSlider.addEventListener('input', function() {
+                angleValue.textContent = this.value + '°';
+            });
+
+            gravitySlider.addEventListener('input', function() {
+                gravityValue.textContent = this.value + ' m/s²';
+            });
+
+            heightSlider.addEventListener('input', function() {
+                heightValue.textContent = this.value + ' m';
+            });
+
+            // Draw the initial scene
+            function drawScene() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw ground
+                ctx.fillStyle = '#8b4513';
+                ctx.fillRect(0, canvas.height - 20, canvas.width, 20);
+                
+                // Draw axes
+                ctx.strokeStyle = '#aaa';
+                ctx.lineWidth = 1;
+                
+                // X-axis
+                ctx.beginPath();
+                ctx.moveTo(origin.x, origin.y);
+                ctx.lineTo(canvas.width - 20, origin.y);
+                ctx.stroke();
+                
+                // Y-axis
+                ctx.beginPath();
+                ctx.moveTo(origin.x, origin.y);
+                ctx.lineTo(origin.x, 20);
+                ctx.stroke();
+                
+                // Draw scale markers
+                ctx.fillStyle = '#666';
+                ctx.font = '10px Arial';
+                ctx.textAlign = 'center';
+                
+                // X-axis markers
+                for (let x = 0; x < (canvas.width - origin.x - 20); x += 50) {
+                    ctx.beginPath();
+                    ctx.moveTo(origin.x + x, origin.y);
+                    ctx.lineTo(origin.x + x, origin.y + 5);
+                    ctx.stroke();
+                    ctx.fillText((x / scale).toFixed(0) + 'm', origin.x + x, origin.y + 18);
+                }
+                
+                // Y-axis markers
+                for (let y = 0; y < (origin.y - 20); y += 50) {
+                    ctx.beginPath();
+                    ctx.moveTo(origin.x, origin.y - y);
+                    ctx.lineTo(origin.x - 5, origin.y - y);
+                    ctx.stroke();
+                    ctx.fillText((y / scale).toFixed(0) + 'm', origin.x - 15, origin.y - y + 3);
+                }
+            }
+
+            // Calculate projectile motion
+            function calculateProjectileMotion(v0, angle, g, h0) {
+                const angleRad = angle * Math.PI / 180;
+                const v0x = v0 * Math.cos(angleRad);
+                const v0y = v0 * Math.sin(angleRad);
+                
+                // Time to reach maximum height
+                const tMaxHeight = v0y / g;
+                const maxHeight = h0 + (v0y * tMaxHeight) - (0.5 * g * tMaxHeight * tMaxHeight);
+                
+                // Time to hit the ground (solve quadratic equation)
+                const a = -0.5 * g;
+                const b = v0y;
+                const c = h0;
+                const discriminant = b * b - 4 * a * c;
+                const tHitGround = (-b - Math.sqrt(discriminant)) / (2 * a);
+                
+                // Total range
+                const range = v0x * tHitGround;
+                
+                return {
+                    v0x,
+                    v0y,
+                    maxHeight,
+                    range,
+                    flightTime: tHitGround,
+                    positions: calculateTrajectory(v0x, v0y, g, h0, tHitGround)
+                };
+            }
+
+            // Calculate trajectory points
+            function calculateTrajectory(v0x, v0y, g, h0, totalTime) {
+                const positions = [];
+                const steps = 100;
+                const timeStep = totalTime / steps;
+                
+                for (let t = 0; t <= totalTime; t += timeStep) {
+                    const x = v0x * t;
+                    const y = h0 + v0y * t - 0.5 * g * t * t;
+                    positions.push({ x, y, t });
+                }
+                
+                return positions;
+            }
+
+            // Animate projectile
+            function animateProjectile(positions) {
+                let index = 0;
+                const totalSteps = positions.length;
+                
+                function animate() {
+                    if (index >= totalSteps) {
+                        isSimulating = false;
+                        return;
+                    }
+                    
+                    const pos = positions[index];
+                    const canvasX = origin.x + pos.x * scale;
+                    const canvasY = origin.y - pos.y * scale;
+                    
+                    // Draw the trajectory up to current point
+                    ctx.strokeStyle = 'rgba(231, 76, 60, 0.5)';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(origin.x, origin.y - heightSlider.value * scale);
+                    
+                    for (let i = 0; i <= index; i++) {
+                        const p = positions[i];
+                        ctx.lineTo(origin.x + p.x * scale, origin.y - p.y * scale);
+                    }
+                    ctx.stroke();
+                    
+                    // Draw projectile
+                    projectile.style.display = 'block';
+                    projectile.style.left = canvasX + 'px';
+                    projectile.style.top = canvasY + 'px';
+                    
+                    // Update tooltip
+                    tooltip.style.left = (canvasX + 15) + 'px';
+                    tooltip.style.top = (canvasY - 15) + 'px';
+                    tooltip.textContent = `t: ${pos.t.toFixed(2)}s\nx: ${pos.x.toFixed(2)}m\ny: ${pos.y.toFixed(2)}m`;
+                    tooltip.style.opacity = '1';
+                    
+                    index++;
+                    animationId = requestAnimationFrame(animate);
+                }
+                
+                isSimulating = true;
+                animate();
+            }
+
+            // Launch button click handler
+            btnLaunch.addEventListener('click', function() {
+                if (isSimulating) {
+                    cancelAnimationFrame(animationId);
+                }
+                
+                const v0 = parseFloat(velocitySlider.value);
+                const angle = parseFloat(angleSlider.value);
+                const g = parseFloat(gravitySlider.value);
+                const h0 = parseFloat(heightSlider.value);
+                
+                const motion = calculateProjectileMotion(v0, angle, g, h0);
+                
+                // Update data displays
+                maxHeightDisplay.innerHTML = motion.maxHeight.toFixed(2) + ' <span class="unit">m</span>';
+                rangeDisplay.innerHTML = motion.range.toFixed(2) + ' <span class="unit">m</span>';
+                flightTimeDisplay.innerHTML = motion.flightTime.toFixed(2) + ' <span class="unit">s</span>';
+                
+                // Draw initial scene
+                drawScene();
+                
+                // Animate projectile
+                animateProjectile(motion.positions);
+            });
+
+            // Reset button click handler
+            btnReset.addEventListener('click', function() {
+                if (isSimulating) {
+                    cancelAnimationFrame(animationId);
+                    isSimulating = false;
+                }
+                
+                projectile.style.display = 'none';
+                tooltip.style.opacity = '0';
+                
+                // Reset data displays
+                maxHeightDisplay.innerHTML = '0 <span class="unit">m</span>';
+                rangeDisplay.innerHTML = '0 <span class="unit">m</span>';
+                flightTimeDisplay.innerHTML = '0 <span class="unit">s</span>';
+                
+                // Redraw scene
+                drawScene();
+            });
+
+            // Hide tooltip when not hovering over projectile
+            projectile.addEventListener('mouseout', function() {
+                tooltip.style.opacity = '0';
+            });
+
+            // Initialize the scene
+            drawScene();
+        });
+    </script>
+</body>
+</html>

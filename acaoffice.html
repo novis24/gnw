@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Academic Results Management</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2980b9;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --info-color: #3498db;
+            --border-radius: 4px;
+            --box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background-color: var(--dark-color);
+            color: white;
+            padding: 15px 0;
+            margin-bottom: 20px;
+            box-shadow: var(--box-shadow);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .logo span {
+            color: var(--primary-color);
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 15px;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            transition: var(--transition);
+            font-size: 14px;
+        }
+
+        nav ul li a:hover {
+            color: var(--primary-color);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--dark-color);
+            font-size: 24px;
+            position: relative;
+            padding-bottom: 8px;
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background-color: var(--primary-color);
+        }
+
+        .class-selector {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .class-selector select, .class-selector button {
+            padding: 8px 15px;
+            border-radius: var(--border-radius);
+            border: 1px solid #ddd;
+            font-size: 14px;
+        }
+
+        .class-selector button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .class-selector button:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .results-container {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            overflow-x: auto;
+            margin-bottom: 20px;
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        .results-table th, .results-table td {
+            padding: 12px 15px;
+            text-align: center;
+            border: 1px solid #ddd;
+            font-size: 14px;
+        }
+
+        .results-table th {
+            background-color: var(--light-color);
+            font-weight: 600;
+            color: var(--dark-color);
+            position: sticky;
+            top: 0;
+        }
+
+        .results-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .results-table tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .student-info {
+            text-align: left !important;
+            white-space: nowrap;
+        }
+
+        .rank-cell {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .excellent {
+            color: var(--success-color);
+            font-weight: 600;
+        }
+
+        .good {
+            color: var(--info-color);
+            font-weight: 600;
+        }
+
+        .average {
+            color: var(--warning-color);
+            font-weight: 600;
+        }
+
+        .poor {
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+
+        .total-cell {
+            font-weight: bold;
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+
+        .average-cell {
+            font-weight: bold;
+            background-color: rgba(39, 174, 96, 0.1);
+        }
+
+        .grade-cell {
+            font-weight: bold;
+        }
+
+        .division-cell {
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .actions-container {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .btn i {
+            margin-right: 5px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #219653;
+        }
+
+        .btn-warning {
+            background-color: var(--warning-color);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background-color: #e67e22;
+        }
+
+        .btn-danger {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+
+        .btn-info {
+            background-color: var(--info-color);
+            color: white;
+        }
+
+        .btn-info:hover {
+            background-color: var(--secondary-color);
+        }
+
+        /* Print styles */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .results-container, .results-container * {
+                visibility: visible;
+            }
+            .results-container {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                margin: 0;
+                box-shadow: none;
+            }
+            .actions-container, .class-selector, header {
+                display: none;
+            }
+            .results-table {
+                min-width: 100%;
+            }
+        }
+
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            nav ul {
+                margin-top: 10px;
+                justify-content: center;
+            }
+            
+            nav ul li {
+                margin: 0 8px;
+            }
+            
+            h1 {
+                font-size: 20px;
+            }
+            
+            .results-table th, .results-table td {
+                padding: 8px 10px;
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo">Academic<span>Results</span></div>
+            <nav>
+                <ul>
+                    <li><a href="#">Dashboard</a></li>
+                    <li><a href="#" class="active">Results</a></li>
+                    <li><a href="#">Students</a></li>
+                    <li><a href="#">Subjects</a></li>
+                    <li><a href="#">Settings</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <h1>Academic Results Management</h1>
+        
+        <div class="class-selector">
+            <select id="classSelect">
+                <option value="">Select Class</option>
+                <option value="4">Standard 4</option>
+                <option value="3">Standard 3</option>
+                <option value="2">Standard 2</option>
+                <option value="1">Standard 1</option>
+            </select>
+            
+            <select id="streamSelect" disabled>
+                <option value="">Select Stream</option>
+            </select>
+            
+            <select id="termSelect" disabled>
+                <option value="">Select Term</option>
+                <option value="1">First Term</option>
+                <option value="2">Second Term</option>
+                <option value="3">Third Term</option>
+            </select>
+            
+            <button id="loadResultsBtn" disabled>
+                <i>↻</i> Load Results
+            </button>
+        </div>
+        
+        <div class="results-container">
+            <table class="results-table" id="resultsTable">
+                <thead>
+                    <tr>
+                        <th rowspan="2">Rank</th>
+                        <th rowspan="2">Reg No.</th>
+                        <th rowspan="2">Student Name</th>
+                        <th rowspan="2">Parent Contact</th>
+                        <!-- Dynamic subjects will be inserted here -->
+                        <th colspan="4">Summary</th>
+                    </tr>
+                    <tr>
+                        <!-- This row will have subject headers -->
+                        <!-- Summary headers -->
+                        <th>Total</th>
+                        <th>Average</th>
+                        <th>Grade</th>
+                        <th>Division</th>
+                    </tr>
+                </thead>
+                <tbody id="resultsBody">
+                    <!-- Dynamic content will be inserted here -->
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="actions-container">
+            <button class="btn btn-success" id="saveBtn">
+                <i>💾</i> Save Results
+            </button>
+            <button class="btn btn-warning" id="printBtn">
+                <i>🖨️</i> Print Results
+            </button>
+            <button class="btn btn-primary" id="reportBtn">
+                <i>📊</i> Generate Report
+            </button>
+            <button class="btn btn-danger" id="parentBtn">
+                <i>📧</i> Report to Parents
+            </button>
+            <button class="btn btn-info" id="shareBtn">
+                <i>↗️</i> Share Results
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Sample data - in a real app, this would come from an API
+        const academicData = {
+            classes: {
+                "4": {
+                    streams: ["A", "B", "C"],
+                    subjects: ["Mathematics", "English", "Science", "History", "Geography"],
+                    students: [
+                        { id: "S401", name: "John Doe", contact: "john.doe@email.com", parent: "Jane Doe", parentPhone: "+255123456789" },
+                        { id: "S402", name: "Jane Smith", contact: "jane.smith@email.com", parent: "John Smith", parentPhone: "+255987654321" },
+                        { id: "S403", name: "Michael Johnson", contact: "michael.j@email.com", parent: "Sarah Johnson", parentPhone: "+255112233445" },
+                        { id: "S404", name: "Sarah Williams", contact: "sarah.w@email.com", parent: "David Williams", parentPhone: "+255556677889" },
+                        { id: "S405", name: "David Brown", contact: "david.b@email.com", parent: "Emily Brown", parentPhone: "+255998877665" }
+                    ],
+                    results: {
+                        "1": { // Term 1
+                            "A": [
+                                { marks: [95, 92, 98, 94, 90] },
+                                { marks: [90, 91, 89, 93, 88] },
+                                { marks: [85, 88, 82, 86, 84] },
+                                { marks: [80, 84, 78, 82, 79] },
+                                { marks: [75, 72, 78, 74, 70] }
+                            ],
+                            "B": [
+                                { marks: [92, 89, 95, 90, 88] },
+                                { marks: [88, 85, 90, 87, 84] },
+                                { marks: [82, 80, 85, 79, 78] },
+                                { marks: [78, 75, 80, 76, 74] },
+                                { marks: [70, 68, 72, 69, 65] }
+                            ]
+                        },
+                        "2": { // Term 2
+                            "A": [
+                                { marks: [93, 94, 97, 95, 91] },
+                                { marks: [89, 92, 90, 94, 87] },
+                                { marks: [84, 87, 83, 85, 82] },
+                                { marks: [79, 83, 77, 81, 78] },
+                                { marks: [74, 71, 77, 73, 69] }
+                            ]
+                        }
+                    }
+                },
+                "3": {
+                    streams: ["A", "B"],
+                    subjects: ["Mathematics", "English", "Science", "Social Studies", "Kiswahili"],
+                    students: [
+                        { id: "S301", name: "Robert Wilson", contact: "robert.w@email.com", parent: "Jessica Wilson", parentPhone: "+255123987456" },
+                        { id: "S302", name: "Jessica Martinez", contact: "jessica.m@email.com", parent: "Robert Martinez", parentPhone: "+255456789123" },
+                        { id: "S303", name: "Daniel Anderson", contact: "daniel.a@email.com", parent: "Lisa Anderson", parentPhone: "+255789123456" }
+                    ],
+                    results: {
+                        "1": {
+                            "A": [
+                                { marks: [92, 88, 95, 89, 90] },
+                                { marks: [87, 85, 90, 84, 86] },
+                                { marks: [82, 78, 85, 79, 80] }
+                            ]
+                        }
+                }
+            }
+        };
+
+        // DOM elements
+        const classSelect = document.getElementById('classSelect');
+        const streamSelect = document.getElementById('streamSelect');
+        const termSelect = document.getElementById('termSelect');
+        const loadResultsBtn = document.getElementById('loadResultsBtn');
+        const resultsTable = document.getElementById('resultsTable');
+        const resultsBody = document.getElementById('resultsBody');
+        const saveBtn = document.getElementById('saveBtn');
+        const printBtn = document.getElementById('printBtn');
+        const reportBtn = document.getElementById('reportBtn');
+        const parentBtn = document.getElementById('parentBtn');
+        const shareBtn = document.getElementById('shareBtn');
+
+        // Event listeners
+        classSelect.addEventListener('change', updateStreams);
+        streamSelect.addEventListener('change', updateTerms);
+        termSelect.addEventListener('change', toggleLoadButton);
+        loadResultsBtn.addEventListener('click', loadResults);
+        printBtn.addEventListener('click', () => window.print());
+        
+        // Initialize
+        function updateStreams() {
+            const selectedClass = classSelect.value;
+            streamSelect.innerHTML = '<option value="">Select Stream</option>';
+            streamSelect.disabled = !selectedClass;
+            
+            if (selectedClass && academicData.classes[selectedClass]) {
+                academicData.classes[selectedClass].streams.forEach(stream => {
+                    const option = document.createElement('option');
+                    option.value = stream;
+                    option.textContent = `Stream ${stream}`;
+                    streamSelect.appendChild(option);
+                });
+            }
+            
+            termSelect.disabled = true;
+            termSelect.value = "";
+            loadResultsBtn.disabled = true;
+        }
+
+        function updateTerms() {
+            const selectedClass = classSelect.value;
+            const selectedStream = streamSelect.value;
+            termSelect.innerHTML = '<option value="">Select Term</option>';
+            termSelect.disabled = !selectedStream;
+            
+            if (selectedClass && selectedStream && academicData.classes[selectedClass].results) {
+                Object.keys(academicData.classes[selectedClass].results).forEach(term => {
+                    if (academicData.classes[selectedClass].results[term][selectedStream]) {
+                        const option = document.createElement('option');
+                        option.value = term;
+                        option.textContent = `Term ${term}`;
+                        termSelect.appendChild(option);
+                    }
+                });
+            }
+            
+            loadResultsBtn.disabled = true;
+        }
+
+        function toggleLoadButton() {
+            loadResultsBtn.disabled = !termSelect.value;
+        }
+
+        function loadResults() {
+            const selectedClass = classSelect.value;
+            const selectedStream = streamSelect.value;
+            const selectedTerm = termSelect.value;
+            
+            if (!selectedClass || !selectedStream || !selectedTerm) return;
+            
+            const classData = academicData.classes[selectedClass];
+            const students = classData.students;
+            const results = classData.results[selectedTerm][selectedStream];
+            const subjects = classData.subjects;
+            
+            // Clear previous results
+            resultsBody.innerHTML = '';
+            
+            // Update table headers for subjects
+            const subjectHeaders = resultsTable.querySelector('thead tr:first-child');
+            // Clear existing subject headers (keep first 4 columns)
+            while (subjectHeaders.children.length > 4) {
+                subjectHeaders.removeChild(subjectHeaders.lastChild);
+            }
+            
+            // Add subject columns
+            subjects.forEach(subject => {
+                const th = document.createElement('th');
+                th.textContent = subject;
+                subjectHeaders.appendChild(th);
+            });
+            
+            // Process results and calculate totals, averages, etc.
+            const processedResults = students.map((student, index) => {
+                const studentResults = results[index].marks;
+                const total = studentResults.reduce((sum, mark) => sum + mark, 0);
+                const average = total / studentResults.length;
+                const grade = calculateGrade(average);
+                const division = calculateDivision(average);
+                
+                return {
+                    ...student,
+                    marks: studentResults,
+                    total,
+                    average,
+                    grade,
+                    division
+                };
+            });
+            
+            // Sort by total marks (descending)
+            processedResults.sort((a, b) => b.total - a.total);
+            
+            // Add ranking
+            processedResults.forEach((result, index) => {
+                result.rank = index + 1;
+            });
+            
+            // Populate table
+            processedResults.forEach(student => {
+                const row = document.createElement('tr');
+                
+                // Rank
+                const rankCell = document.createElement('td');
+                rankCell.textContent = student.rank;
+                rankCell.className = 'rank-cell';
+                row.appendChild(rankCell);
+                
+                // Student ID
+                const idCell = document.createElement('td');
+                idCell.textContent = student.id;
+                row.appendChild(idCell);
+                
+                // Student Name
+                const nameCell = document.createElement('td');
+                nameCell.textContent = student.name;
+                nameCell.className = 'student-info';
+                row.appendChild(nameCell);
+                
+                // Parent Contact
+                const contactCell = document.createElement('td');
+                contactCell.textContent = student.parentPhone;
+                contactCell.className = 'student-info';
+                row.appendChild(contactCell);
+                
+                // Subject marks
+                student.marks.forEach(mark => {
+                    const markCell = document.createElement('td');
+                    markCell.textContent = mark;
+                    
+                    // Color code based on performance
+                    if (mark >= 80) markCell.className = 'excellent';
+                    else if (mark >= 60) markCell.className = 'good';
+                    else if (mark >= 40) markCell.className = 'average';
+                    else markCell.className = 'poor';
+                    
+                    row.appendChild(markCell);
+                });
+                
+                // Total
+                const totalCell = document.createElement('td');
+                totalCell.textContent = student.total;
+                totalCell.className = 'total-cell';
+                row.appendChild(totalCell);
+                
+                // Average
+                const avgCell = document.createElement('td');
+                avgCell.textContent = student.average.toFixed(1);
+                avgCell.className = 'average-cell';
+                row.appendChild(avgCell);
+                
+                // Grade
+                const gradeCell = document.createElement('td');
+                gradeCell.textContent = student.grade;
+                gradeCell.className = 'grade-cell ' + getGradeClass(student.grade);
+                row.appendChild(gradeCell);
+                
+                // Division
+                const divCell = document.createElement('td');
+                divCell.textContent = student.division;
+                divCell.className = 'division-cell ' + getDivisionClass(student.division);
+                row.appendChild(divCell);
+                
+                resultsBody.appendChild(row);
+            });
+        }
+
+        function calculateGrade(average) {
+            if (average >= 80) return 'A';
+            if (average >= 70) return 'B';
+            if (average >= 60) return 'C';
+            if (average >= 50) return 'D';
+            return 'E';
+        }
+
+        function calculateDivision(average) {
+            if (average >= 75) return 'I';
+            if (average >= 60) return 'II';
+            if (average >= 40) return 'III';
+            return 'IV';
+        }
+
+        function getGradeClass(grade) {
+            switch(grade) {
+                case 'A': return 'excellent';
+                case 'B': return 'good';
+                case 'C': return 'average';
+                default: return 'poor';
+            }
+        }
+
+        function getDivisionClass(division) {
+            switch(division) {
+                case 'I': return 'excellent';
+                case 'II': return 'good';
+                case 'III': return 'average';
+                default: return 'poor';
+            }
+        }
+
+        // Initialize with sample data for demo
+        updateStreams();
+    </script>
+</body>
+</html>

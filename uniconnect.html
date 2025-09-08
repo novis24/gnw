@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>University Student Organization Portal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* CSS Variables for consistent theming */
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --gray: #95a5a6;
+            --white: #ffffff;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Container for the entire app */
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Header Styles */
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: var(--white);
+            padding: 1rem 2rem;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo img {
+            height: 50px;
+            width: auto;
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        /* Navigation */
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 1.5rem;
+        }
+
+        nav a {
+            color: var(--white);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+        }
+
+        nav a:hover, nav a.active {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--white);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Main Content Area */
+        main {
+            flex: 1;
+            max-width: 1200px;
+            width: 100%;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        /* Section Styling */
+        .section {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Welcome Section (Landing Page) */
+        .welcome-section {
+            text-align: center;
+            padding: 2rem;
+            background: var(--white);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+        }
+
+        .welcome-section h2 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 2.5rem;
+        }
+
+        .welcome-section p {
+            font-size: 1.1rem;
+            color: #555;
+            max-width: 800px;
+            margin: 0 auto 2rem;
+        }
+
+        .welcome-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        /* Card Styles */
+        .card {
+            background: var(--white);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            color: var(--primary);
+        }
+
+        /* Button Styles */
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background-color: var(--secondary);
+            color: var(--white);
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 600;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .btn-accent {
+            background-color: var(--accent);
+        }
+
+        .btn-accent:hover {
+            background-color: #c0392b;
+        }
+
+        /* Message Filter Section */
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: var(--white);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .filter-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .filter-group select, .filter-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        /* Message Grid */
+        .message-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .message-card {
+            background: var(--white);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .message-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .message-category {
+            padding: 0.5rem 1rem;
+            color: var(--white);
+            font-weight: 600;
+        }
+
+        .category-academic {
+            background-color: var(--secondary);
+        }
+
+        .category-sports {
+            background-color: var(--success);
+        }
+
+        .category-health {
+            background-color: var(--accent);
+        }
+
+        .category-ipt {
+            background-color: var(--warning);
+        }
+
+        .message-content {
+            padding: 1rem;
+        }
+
+        .message-title {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+        }
+
+        .message-meta {
+            display: flex;
+            justify-content: space-between;
+            color: var(--gray);
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+
+        textarea.form-control {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        /* Chat Interface */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 500px;
+            background: var(--white);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .chat-header {
+            padding: 1rem;
+            background: var(--primary);
+            color: var(--white);
+            font-weight: 600;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 0.75rem;
+            border-radius: 8px;
+        }
+
+        .message.received {
+            align-self: flex-start;
+            background: #eef2f7;
+        }
+
+        .message.sent {
+            align-self: flex-end;
+            background: var(--secondary);
+            color: var(--white);
+        }
+
+        .chat-input {
+            display: flex;
+            padding: 1rem;
+            border-top: 1px solid #eee;
+            background: #f9f9f9;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-right: 0.5rem;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--dark);
+            color: var(--white);
+            padding: 2rem;
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .social-links a {
+            color: var(--white);
+            font-size: 1.5rem;
+            transition: var(--transition);
+        }
+
+        .social-links a:hover {
+            color: var(--secondary);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 900px) {
+            nav ul {
+                gap: 1rem;
+            }
+            
+            .welcome-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .message-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+            
+            nav ul {
+                flex-direction: column;
+                gap: 0.5rem;
+                display: none;
+            }
+            
+            nav ul.show {
+                display: flex;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+                position: absolute;
+                top: 1rem;
+                right: 1rem;
+            }
+            
+            .filters {
+                flex-direction: column;
+            }
+            
+            .chat-container {
+                height: 400px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .logo h1 {
+                font-size: 1.2rem;
+            }
+            
+            .welcome-section h2 {
+                font-size: 2rem;
+            }
+            
+            .message-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .message {
+                max-width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-graduation-cap fa-2x"></i>
+                    <h1>University Student Portal</h1>
+                </div>
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <nav>
+                    <ul id="navMenu">
+                        <li><a href="#welcome" class="nav-link active">Home</a></li>
+                        <li><a href="#president" class="nav-link">President</a></li>
+                        <li><a href="#ministers" class="nav-link">Ministers</a></li>
+                        <li><a href="#messages" class="nav-link">Messages</a></li>
+                        <li><a href="#chat" class="nav-link">Chat</a></li>
+                        <li><a href="#events" class="nav-link">Events</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </header>
+
+        <main>
+            <!-- Welcome Section -->
+            <section id="welcome" class="section active">
+                <div class="welcome-section">
+                    <h2>Welcome to Student Organization Portal</h2>
+                    <p>This is the official platform for students to connect with the student government, access important updates, and participate in university activities.</p>
+                    <div class="welcome-actions">
+                        <a href="#messages" class="btn">View Messages</a>
+                        <a href="#events" class="btn btn-accent">Upcoming Events</a>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Quick Links</h3>
+                    </div>
+                    <div class="quick-links" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                        <a href="#" class="btn" style="text-align: center;">
+                            <i class="fas fa-calendar-alt"></i> Academic Calendar
+                        </a>
+                        <a href="#" class="btn" style="text-align: center;">
+                            <i class="fas fa-book"></i> Resources
+                        </a>
+                        <a href="#" class="btn" style="text-align: center;">
+                            <i class="fas fa-clipboard-list"></i> Applications
+                        </a>
+                        <a href="#" class="btn" style="text-align: center;">
+                            <i class="fas fa-hands-helping"></i> Student Support
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- President Section -->
+            <section id="president" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">President's Dashboard</h3>
+                    </div>
+                    <div class="card-content">
+                        <p>Welcome, President. Here you can manage announcements, communicate with ministers, and view reports.</p>
+                        
+                        <div class="form-group">
+                            <label for="presidentMessage">New Announcement</label>
+                            <textarea class="form-control" id="presidentMessage" placeholder="Type your announcement here..."></textarea>
+                        </div>
+                        <button class="btn">Publish Announcement</button>
+                        
+                        <h4 style="margin-top: 2rem;">Recent Communications</h4>
+                        <div class="message-list" style="margin-top: 1rem;">
+                            <div class="message received">
+                                <strong>Minister of Sports:</strong> The tournament schedule is ready for review.
+                            </div>
+                            <div class="message sent">
+                                <strong>You:</strong> Please share it with the committee first.
+                            </div>
+                            <div class="message received">
+                                <strong>Minister of Education:</strong> The study workshop materials are prepared.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Ministers Section -->
+            <section id="ministers" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Ministers Portal</h3>
+                    </div>
+                    <div class="card-content">
+                        <p>As a minister, you can submit updates, manage your department activities, and communicate with the president.</p>
+                        
+                        <div class="form-group">
+                            <label for="updateCategory">Update Category</label>
+                            <select class="form-control" id="updateCategory">
+                                <option value="academic">Academic</option>
+                                <option value="sports">Sports</option>
+                                <option value="health">Health</option>
+                                <option value="ipt">IPT Training</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="ministerUpdate">Department Update</label>
+                            <textarea class="form-control" id="ministerUpdate" placeholder="Provide your update here..."></textarea>
+                        </div>
+                        <button class="btn">Submit Update</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Messages Section -->
+            <section id="messages" class="section">
+                <div class="filters">
+                    <div class="filter-group">
+                        <label for="categoryFilter">Category</label>
+                        <select class="form-control" id="categoryFilter">
+                            <option value="all">All Categories</option>
+                            <option value="academic">Academic</option>
+                            <option value="sports">Sports</option>
+                            <option value="health">Health</option>
+                            <option value="ipt">IPT Training</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="timeFilter">Time</label>
+                        <select class="form-control" id="timeFilter">
+                            <option value="recent">Most Recent</option>
+                            <option value="week">Past Week</option>
+                            <option value="month">Past Month</option>
+                            <option value="year">Past Year</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="searchFilter">Search</label>
+                        <input type="text" class="form-control" id="searchFilter" placeholder="Search messages...">
+                    </div>
+                </div>
+                
+                <h3>Latest Messages</h3>
+                <div class="message-grid">
+                    <div class="message-card">
+                        <div class="message-category category-academic">Academic</div>
+                        <div class="message-content">
+                            <h4 class="message-title">Final Exam Schedule Released</h4>
+                            <div class="message-meta">
+                                <span>By: Academic Office</span>
+                                <span>Dec 10, 2023</span>
+                            </div>
+                            <p>The final examination schedule for the Fall semester has been published. Please check your student portal.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="message-card">
+                        <div class="message-category category-sports">Sports</div>
+                        <div class="message-content">
+                            <h4 class="message-title">Basketball Tournament Next Week</h4>
+                            <div class="message-meta">
+                                <span>By: Sports Minister</span>
+                                <span>Dec 5, 2023</span>
+                            </div>
+                            <p>Annual inter-department basketball tournament starts next Monday. Register your team by Friday.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="message-card">
+                        <div class="message-category category-health">Health</div>
+                        <div class="message-content">
+                            <h4 class="message-title">Health Checkup Camp</h4>
+                            <div class="message-meta">
+                                <span>By: Health Services</span>
+                                <span>Dec 3, 2023</span>
+                            </div>
+                            <p>Free health checkup camp will be organized next Wednesday at the campus clinic.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="message-card">
+                        <div class="message-category category-ipt">IPT Training</div>
+                        <div class="message-content">
+                            <h4 class="message-title">Python Workshop</h4>
+                            <div class="message-meta">
+                                <span>By: IT Department</span>
+                                <span>Nov 28, 2023</span>
+                            </div>
+                            <p>Python programming workshop will be conducted next week. Limited seats available.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Chat Section -->
+            <section id="chat" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Chat with Ministers</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="chat-container">
+                            <div class="chat-header">
+                                Chat with President and Ministers
+                            </div>
+                            <div class="chat-messages">
+                                <div class="message received">
+                                    <strong>Sports Minister:</strong> Hi, need approval for the tournament budget.
+                                </div>
+                                <div class="message sent">
+                                    <strong>You:</strong> Please send me the detailed breakdown.
+                                </div>
+                                <div class="message received">
+                                    <strong>Education Minister:</strong> When is the next meeting scheduled?
+                                </div>
+                                <div class="message received">
+                                    <strong>Health Minister:</strong> The health camp was successful with 200+ participants.
+                                </div>
+                            </div>
+                            <div class="chat-input">
+                                <input type="text" placeholder="Type your message here...">
+                                <button class="btn">Send</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Events Section -->
+            <section id="events" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Upcoming Events</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="event-list">
+                            <div class="event-item" style="display: flex; gap: 1rem; padding: 1rem; border-bottom: 1px solid #eee;">
+                                <div style="background: var(--secondary); color: white; padding: 1rem; border-radius: 8px; text-align: center; min-width: 80px;">
+                                    <div style="font-size: 1.5rem; font-weight: bold;">15</div>
+                                    <div>DEC</div>
+                                </div>
+                                <div>
+                                    <h4>Annual Cultural Festival</h4>
+                                    <p>Main Grounds, 4:00 PM</p>
+                                </div>
+                            </div>
+                            
+                            <div class="event-item" style="display: flex; gap: 1rem; padding: 1rem; border-bottom: 1px solid #eee;">
+                                <div style="background: var(--accent); color: white; padding: 1rem; border-radius: 8px; text-align: center; min-width: 80px;">
+                                    <div style="font-size: 1.5rem; font-weight: bold;">18</div>
+                                    <div>DEC</div>
+                                </div>
+                                <div>
+                                    <h4>Career Guidance Workshop</h4>
+                                    <p>Auditorium A, 10:00 AM</p>
+                                </div>
+                            </div>
+                            
+                            <div class="event-item" style="display: flex; gap: 1rem; padding: 1rem;">
+                                <div style="background: var(--success); color: white; padding: 1rem; border-radius: 8px; text-align: center; min-width: 80px;">
+                                    <div style="font-size: 1.5rem; font-weight: bold;">20</div>
+                                    <div>DEC</div>
+                                </div>
+                                <div>
+                                    <h4>Sports Tournament Finals</h4>
+                                    <p>Basketball Court, 3:00 PM</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <div class="footer-content">
+                <p>University Student Organization Portal &copy; 2023</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-linkedin"></i></a>
+                </div>
+                <p>Contact: admin@university.edu | Phone: (123) 456-7890</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // DOM Elements
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const navMenu = document.getElementById('navMenu');
+        const navLinks = document.querySelectorAll('.nav-link');
+        const sections = document.querySelectorAll('.section');
+
+        // Toggle mobile menu
+        mobileMenuBtn.addEventListener('click', () => {
+            navMenu.classList.toggle('show');
+        });
+
+        // Handle navigation
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                // Remove active class from all links and sections
+                navLinks.forEach(l => l.classList.remove('active'));
+                sections.forEach(s => s.classList.remove('active'));
+                
+                // Add active class to clicked link
+                link.classList.add('active');
+                
+                // Show corresponding section
+                const targetSection = link.getAttribute('href').substring(1);
+                document.getElementById(targetSection).classList.add('active');
+                
+                // Close mobile menu after selection
+                if (navMenu.classList.contains('show')) {
+                    navMenu.classList.remove('show');
+                }
+                
+                // Scroll to top
+                window.scrollTo(0, 0);
+            });
+        });
+
+        // Sample data for messages (in a real app, this would come from a server)
+        const messages = [
+            {
+                category: 'academic',
+                title: 'Final Exam Schedule Released',
+                author: 'Academic Office',
+                date: 'Dec 10, 2023',
+                content: 'The final examination schedule for the Fall semester has been published. Please check your student portal.'
+            },
+            {
+                category: 'sports',
+                title: 'Basketball Tournament Next Week',
+                author: 'Sports Minister',
+                date: 'Dec 5, 2023',
+                content: 'Annual inter-department basketball tournament starts next Monday. Register your team by Friday.'
+            },
+            {
+                category: 'health',
+                title: 'Health Checkup Camp',
+                author: 'Health Services',
+                date: 'Dec 3, 2023',
+                content: 'Free health checkup camp will be organized next Wednesday at the campus clinic.'
+            },
+            {
+                category: 'ipt',
+                title: 'Python Workshop',
+                author: 'IT Department',
+                date: 'Nov 28, 2023',
+                content: 'Python programming workshop will be conducted next week. Limited seats available.'
+            }
+        ];
+
+        // Filter functionality (simplified for the template)
+        const categoryFilter = document.getElementById('categoryFilter');
+        const timeFilter = document.getElementById('timeFilter');
+        const searchFilter = document.getElementById('searchFilter');
+
+        // In a real application, you would add event listeners to these filters
+        // and implement the actual filtering logic based on your data source
+
+        // Example of sending a message in the chat
+        const chatInput = document.querySelector('.chat-input input');
+        const chatSendBtn = document.querySelector('.chat-input .btn');
+        const chatMessages = document.querySelector('.chat-messages');
+
+        chatSendBtn.addEventListener('click', () => {
+            if (chatInput.value.trim() !== '') {
+                const newMessage = document.createElement('div');
+                newMessage.classList.add('message', 'sent');
+                newMessage.innerHTML = `<strong>You:</strong> ${chatInput.value}`;
+                chatMessages.appendChild(newMessage);
+                chatInput.value = '';
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                
+                // Simulate a reply after a short delay
+                setTimeout(() => {
+                    const replies = [
+                        "Thanks for your message!",
+                        "I'll look into that.",
+                        "Can you provide more details?",
+                        "Let me check and get back to you."
+                    ];
+                    const randomReply = replies[Math.floor(Math.random() * replies.length)];
+                    
+                    const replyMessage = document.createElement('div');
+                    replyMessage.classList.add('message', 'received');
+                    replyMessage.innerHTML = `<strong>President:</strong> ${randomReply}`;
+                    chatMessages.appendChild(replyMessage);
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }, 1000);
+            }
+        });
+
+        // Allow pressing Enter to send message
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                chatSendBtn.click();
+            }
+        });
+    </script>
+</body>
+</html>

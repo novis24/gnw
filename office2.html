@@ -1,0 +1,1413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Academic Results Management System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2980b9;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --info-color: #3498db;
+            --border-radius: 6px;
+            --box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background-color: var(--dark-color);
+            color: white;
+            padding: 15px 0;
+            margin-bottom: 25px;
+            box-shadow: var(--box-shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo i {
+            margin-right: 10px;
+            color: var(--primary-color);
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 20px;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            transition: var(--transition);
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        nav ul li a i {
+            margin-right: 5px;
+        }
+
+        nav ul li a:hover {
+            color: var(--primary-color);
+        }
+
+        .main-title {
+            text-align: center;
+            margin-bottom: 25px;
+            color: var(--dark-color);
+            font-size: 28px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .main-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background-color: var(--primary-color);
+        }
+
+        /* Dashboard Layout */
+        .dashboard {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 25px;
+        }
+
+        /* Settings Panel */
+        .settings-panel {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 20px;
+            height: fit-content;
+            position: sticky;
+            top: 90px;
+        }
+
+        .settings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .settings-header h3 {
+            color: var(--dark-color);
+            font-size: 18px;
+        }
+
+        .settings-tabs {
+            display: flex;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .settings-tab {
+            padding: 8px 15px;
+            cursor: pointer;
+            font-size: 14px;
+            border-bottom: 2px solid transparent;
+            transition: var(--transition);
+        }
+
+        .settings-tab.active {
+            border-bottom-color: var(--primary-color);
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        .settings-content {
+            display: none;
+        }
+
+        .settings-content.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--dark-color);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 14px;
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .btn i {
+            margin-right: 5px;
+        }
+
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 13px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #219653;
+        }
+
+        .btn-warning {
+            background-color: var(--warning-color);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background-color: #e67e22;
+        }
+
+        .btn-danger {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+
+        .btn-info {
+            background-color: var(--info-color);
+            color: white;
+        }
+
+        .btn-info:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .btn-light {
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        .btn-light:hover {
+            background-color: #e2e6ea;
+        }
+
+        /* Grading System Configuration */
+        .grading-system {
+            margin-top: 20px;
+        }
+
+        .grading-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+
+        .grading-table th, .grading-table td {
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #ddd;
+            font-size: 13px;
+        }
+
+        .grading-table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+
+        .grading-table input {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+
+        /* Results Panel */
+        .results-panel {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 20px;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .panel-header h3 {
+            color: var(--dark-color);
+            font-size: 18px;
+        }
+
+        .panel-tools {
+            display: flex;
+            gap: 10px;
+        }
+
+        .filter-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-select {
+            min-width: 180px;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 14px;
+        }
+
+        /* Results Table */
+        .results-container {
+            overflow-x: auto;
+            margin-bottom: 20px;
+            border: 1px solid #eee;
+            border-radius: var(--border-radius);
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1000px;
+        }
+
+        .results-table th, .results-table td {
+            padding: 12px 15px;
+            text-align: center;
+            border: 1px solid #eee;
+            font-size: 14px;
+        }
+
+        .results-table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: var(--dark-color);
+            position: sticky;
+            top: 0;
+        }
+
+        .results-table tr:nth-child(even) {
+            background-color: #fcfcfc;
+        }
+
+        .results-table tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .student-info {
+            text-align: left !important;
+            white-space: nowrap;
+        }
+
+        .rank-cell {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .excellent {
+            color: var(--success-color);
+            font-weight: 600;
+        }
+
+        .good {
+            color: var(--info-color);
+            font-weight: 600;
+        }
+
+        .average {
+            color: var(--warning-color);
+            font-weight: 600;
+        }
+
+        .poor {
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+
+        .total-cell {
+            font-weight: bold;
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+
+        .average-cell {
+            font-weight: bold;
+            background-color: rgba(39, 174, 96, 0.1);
+        }
+
+        .grade-cell {
+            font-weight: bold;
+        }
+
+        .division-cell {
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .gpa-cell {
+            font-weight: bold;
+            background-color: rgba(155, 89, 182, 0.1);
+        }
+
+        /* Import Panel */
+        .import-panel {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .upload-area {
+            border: 2px dashed #ddd;
+            border-radius: var(--border-radius);
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary-color);
+            background-color: rgba(52, 152, 219, 0.05);
+        }
+
+        .upload-area i {
+            font-size: 48px;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .upload-area p {
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .upload-area small {
+            color: #999;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 50px auto;
+            max-width: 800px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            animation: modalFadeIn 0.3s;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            font-size: 18px;
+            color: var(--dark-color);
+        }
+
+        .modal-body {
+            padding: 20px;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        .modal-footer {
+            padding: 15px 20px;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 992px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .settings-panel {
+                position: static;
+                margin-bottom: 20px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            nav ul {
+                margin-top: 15px;
+                justify-content: center;
+            }
+            
+            nav ul li {
+                margin: 0 10px;
+            }
+            
+            .filter-controls {
+                flex-direction: column;
+            }
+            
+            .filter-select {
+                width: 100%;
+            }
+            
+            .panel-tools {
+                flex-wrap: wrap;
+                justify-content: flex-end;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .results-panel, .results-panel * {
+                visibility: visible;
+            }
+            .results-panel {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                margin: 0;
+                box-shadow: none;
+                border: none;
+            }
+            .panel-header, .filter-controls {
+                display: none;
+            }
+            .results-table {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo">
+                <i class="fas fa-graduation-cap"></i>
+                <span>AcademicMaster</span>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                    <li><a href="#" class="active"><i class="fas fa-table"></i> Results</a></li>
+                    <li><a href="#"><i class="fas fa-cog"></i> Settings</a></li>
+                    <li><a href="#"><i class="fas fa-user"></i> Profile</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <h1 class="main-title">Academic Results Management System</h1>
+        
+        <div class="dashboard">
+            <!-- Settings Panel -->
+            <div class="settings-panel">
+                <div class="settings-header">
+                    <h3><i class="fas fa-cog"></i> Academic Settings</h3>
+                    <button class="btn btn-primary btn-sm" id="saveSettingsBtn">
+                        <i class="fas fa-save"></i> Save
+                    </button>
+                </div>
+                
+                <div class="settings-tabs">
+                    <div class="settings-tab active" data-tab="grading">Grading</div>
+                    <div class="settings-tab" data-tab="division">Division</div>
+                    <div class="settings-tab" data-tab="gpa">GPA</div>
+                </div>
+                
+                <!-- Grading System Settings -->
+                <div class="settings-content active" id="gradingSettings">
+                    <div class="form-group">
+                        <label>Grading System Type</label>
+                        <select class="form-control" id="gradingSystemType">
+                            <option value="percentage">Percentage</option>
+                            <option value="letter">Letter Grades</option>
+                            <option value="points">Points System</option>
+                        </select>
+                    </div>
+                    
+                    <div class="grading-system">
+                        <h4>Grade Boundaries</h4>
+                        <table class="grading-table">
+                            <thead>
+                                <tr>
+                                    <th>Grade</th>
+                                    <th>Min %</th>
+                                    <th>Max %</th>
+                                    <th>Points</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody id="gradeBoundaries">
+                                <!-- Dynamic content will be inserted here -->
+                            </tbody>
+                        </table>
+                        <button class="btn btn-light btn-sm" id="addGradeBtn">
+                            <i class="fas fa-plus"></i> Add Grade
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Division System Settings -->
+                <div class="settings-content" id="divisionSettings">
+                    <div class="form-group">
+                        <label>Division System Type</label>
+                        <select class="form-control" id="divisionSystemType">
+                            <option value="standard">Standard (I-IV)</option>
+                            <option value="custom">Custom</option>
+                        </select>
+                    </div>
+                    
+                    <div id="standardDivision" class="division-system">
+                        <p>Standard division system with four divisions (I, II, III, IV) based on percentage ranges.</p>
+                    </div>
+                    
+                    <div id="customDivision" class="division-system" style="display: none;">
+                        <table class="grading-table">
+                            <thead>
+                                <tr>
+                                    <th>Division</th>
+                                    <th>Min %</th>
+                                    <th>Max %</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody id="divisionBoundaries">
+                                <!-- Dynamic content will be inserted here -->
+                            </tbody>
+                        </table>
+                        <button class="btn btn-light btn-sm" id="addDivisionBtn">
+                            <i class="fas fa-plus"></i> Add Division
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- GPA System Settings -->
+                <div class="settings-content" id="gpaSettings">
+                    <div class="form-group">
+                        <label>GPA Scale</label>
+                        <select class="form-control" id="gpaScale">
+                            <option value="4.0">4.0 Scale</option>
+                            <option value="5.0">5.0 Scale</option>
+                            <option value="custom">Custom Scale</option>
+                        </select>
+                    </div>
+                    
+                    <div id="standardGPA" class="gpa-system">
+                        <p>Standard GPA calculation based on selected scale.</p>
+                    </div>
+                    
+                    <div id="customGPA" class="gpa-system" style="display: none;">
+                        <table class="grading-table">
+                            <thead>
+                                <tr>
+                                    <th>Grade</th>
+                                    <th>GPA Value</th>
+                                </tr>
+                            </thead>
+                            <tbody id="gpaValues">
+                                <!-- Dynamic content will be inserted here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main Content Panel -->
+            <div class="results-content">
+                <!-- Results Panel -->
+                <div class="results-panel">
+                    <div class="panel-header">
+                        <h3><i class="fas fa-table"></i> Student Results</h3>
+                        <div class="panel-tools">
+                            <button class="btn btn-success" id="importResultsBtn">
+                                <i class="fas fa-file-import"></i> Import
+                            </button>
+                            <button class="btn btn-primary" id="exportResultsBtn">
+                                <i class="fas fa-file-export"></i> Export
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="filter-controls">
+                        <select class="filter-select" id="classFilter">
+                            <option value="">Select Class</option>
+                            <option value="4">Standard 4</option>
+                            <option value="3">Standard 3</option>
+                            <option value="2">Standard 2</option>
+                            <option value="1">Standard 1</option>
+                        </select>
+                        
+                        <select class="filter-select" id="streamFilter" disabled>
+                            <option value="">Select Stream</option>
+                        </select>
+                        
+                        <select class="filter-select" id="termFilter" disabled>
+                            <option value="">Select Term</option>
+                            <option value="1">Term 1</option>
+                            <option value="2">Term 2</option>
+                            <option value="3">Term 3</option>
+                        </select>
+                        
+                        <button class="btn btn-primary" id="applyFilterBtn" disabled>
+                            <i class="fas fa-filter"></i> Apply Filters
+                        </button>
+                    </div>
+                    
+                    <div class="results-container">
+                        <table class="results-table" id="resultsTable">
+                            <thead>
+                                <tr>
+                                    <th rowspan="2">Rank</th>
+                                    <th rowspan="2">Reg No.</th>
+                                    <th rowspan="2">Student Name</th>
+                                    <th rowspan="2">Parent Contact</th>
+                                    <!-- Dynamic subjects will be inserted here -->
+                                    <th colspan="5">Summary</th>
+                                </tr>
+                                <tr>
+                                    <!-- This row will have subject headers -->
+                                    <!-- Summary headers -->
+                                    <th>Total</th>
+                                    <th>Average</th>
+                                    <th>Grade</th>
+                                    <th>Division</th>
+                                    <th>GPA</th>
+                                </tr>
+                            </thead>
+                            <tbody id="resultsBody">
+                                <!-- Dynamic content will be inserted here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="actions-container">
+                        <button class="btn btn-success" id="saveResultsBtn">
+                            <i class="fas fa-save"></i> Save Results
+                        </button>
+                        <button class="btn btn-warning" id="printResultsBtn">
+                            <i class="fas fa-print"></i> Print Results
+                        </button>
+                        <button class="btn btn-primary" id="generateReportBtn">
+                            <i class="fas fa-file-alt"></i> Generate Report
+                        </button>
+                        <button class="btn btn-danger" id="reportToParentsBtn">
+                            <i class="fas fa-envelope"></i> Report to Parents
+                        </button>
+                        <button class="btn btn-info" id="shareResultsBtn">
+                            <i class="fas fa-share-alt"></i> Share Results
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Import Panel (initially hidden) -->
+                <div class="import-panel" id="importPanel" style="display: none;">
+                    <div class="panel-header">
+                        <h3><i class="fas fa-file-import"></i> Import Results</h3>
+                        <button class="btn btn-light" id="closeImportBtn">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="upload-area" id="uploadArea">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Drag & drop your results file here</p>
+                        <p><small>or</small></p>
+                        <button class="btn btn-primary">
+                            <i class="fas fa-folder-open"></i> Browse Files
+                        </button>
+                        <p><small>Supported formats: CSV, Excel, PDF</small></p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Import Type</label>
+                        <select class="form-control" id="importType">
+                            <option value="new">Create New Results</option>
+                            <option value="update">Update Existing Results</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Data Mapping</label>
+                        <div id="dataMappingContainer">
+                            <!-- Dynamic mapping fields will be inserted here -->
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <button class="btn btn-success" id="processImportBtn">
+                            <i class="fas fa-cogs"></i> Process Import
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Preview Modal -->
+    <div class="modal" id="previewModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Results Preview</h3>
+                <button class="btn btn-light close-modal">&times;</button>
+            </div>
+            <div class="modal-body" id="previewModalBody">
+                <!-- Preview content will be inserted here -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-light close-modal">Cancel</button>
+                <button class="btn btn-primary" id="confirmImportBtn">Confirm Import</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample Data
+        const academicData = {
+            settings: {
+                gradingSystem: {
+                    type: "percentage",
+                    gradeBoundaries: [
+                        { grade: "A", min: 80, max: 100, points: 4.0, description: "Excellent" },
+                        { grade: "B", min: 70, max: 79, points: 3.0, description: "Good" },
+                        { grade: "C", min: 60, max: 69, points: 2.0, description: "Average" },
+                        { grade: "D", min: 50, max: 59, points: 1.0, description: "Below Average" },
+                        { grade: "E", min: 0, max: 49, points: 0.0, description: "Fail" }
+                    ]
+                },
+                divisionSystem: {
+                    type: "standard",
+                    customBoundaries: []
+                },
+                gpaSystem: {
+                    scale: "4.0",
+                    customValues: []
+                }
+            },
+            classes: {
+                "4": {
+                    streams: ["A", "B", "C"],
+                    subjects: ["Mathematics", "English", "Science", "History", "Geography"],
+                    students: [
+                        { id: "S401", name: "John Doe", contact: "john.doe@email.com", parent: "Jane Doe", parentPhone: "+255123456789" },
+                        { id: "S402", name: "Jane Smith", contact: "jane.smith@email.com", parent: "John Smith", parentPhone: "+255987654321" },
+                        { id: "S403", name: "Michael Johnson", contact: "michael.j@email.com", parent: "Sarah Johnson", parentPhone: "+255112233445" },
+                        { id: "S404", name: "Sarah Williams", contact: "sarah.w@email.com", parent: "David Williams", parentPhone: "+255556677889" },
+                        { id: "S405", name: "David Brown", contact: "david.b@email.com", parent: "Emily Brown", parentPhone: "+255998877665" }
+                    ],
+                    results: {
+                        "1": {
+                            "A": [
+                                { marks: [95, 92, 98, 94, 90] },
+                                { marks: [90, 91, 89, 93, 88] },
+                                { marks: [85, 88, 82, 86, 84] },
+                                { marks: [80, 84, 78, 82, 79] },
+                                { marks: [75, 72, 78, 74, 70] }
+                            ]
+                        }
+                    }
+                }
+            }
+        };
+
+        // DOM Elements
+        const gradeBoundariesTable = document.getElementById('gradeBoundaries');
+        const divisionBoundariesTable = document.getElementById('divisionBoundaries');
+        const gpaValuesTable = document.getElementById('gpaValues');
+        const gradingSystemType = document.getElementById('gradingSystemType');
+        const divisionSystemType = document.getElementById('divisionSystemType');
+        const gpaScale = document.getElementById('gpaScale');
+        const settingsTabs = document.querySelectorAll('.settings-tab');
+        const settingsContents = document.querySelectorAll('.settings-content');
+        const standardDivision = document.getElementById('standardDivision');
+        const customDivision = document.getElementById('customDivision');
+        const standardGPA = document.getElementById('standardGPA');
+        const customGPA = document.getElementById('customGPA');
+        const classFilter = document.getElementById('classFilter');
+        const streamFilter = document.getElementById('streamFilter');
+        const termFilter = document.getElementById('termFilter');
+        const applyFilterBtn = document.getElementById('applyFilterBtn');
+        const resultsTable = document.getElementById('resultsTable');
+        const resultsBody = document.getElementById('resultsBody');
+        const importPanel = document.getElementById('importPanel');
+        const importResultsBtn = document.getElementById('importResultsBtn');
+        const closeImportBtn = document.getElementById('closeImportBtn');
+        const previewModal = document.getElementById('previewModal');
+        const closeModalBtns = document.querySelectorAll('.close-modal');
+
+        // Initialize the settings panel
+        function initializeSettings() {
+            // Grading System
+            gradingSystemType.value = academicData.settings.gradingSystem.type;
+            renderGradeBoundaries();
+            
+            // Division System
+            divisionSystemType.value = academicData.settings.divisionSystem.type;
+            toggleDivisionSystem();
+            
+            // GPA System
+            gpaScale.value = academicData.settings.gpaSystem.scale;
+            toggleGPASystem();
+        }
+
+        // Render grade boundaries table
+        function renderGradeBoundaries() {
+            gradeBoundariesTable.innerHTML = '';
+            academicData.settings.gradingSystem.gradeBoundaries.forEach(grade => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><input type="text" class="form-control" value="${grade.grade}" placeholder="Grade"></td>
+                    <td><input type="number" class="form-control" value="${grade.min}" placeholder="Min %"></td>
+                    <td><input type="number" class="form-control" value="${grade.max}" placeholder="Max %"></td>
+                    <td><input type="number" class="form-control" value="${grade.points}" placeholder="Points" step="0.1"></td>
+                    <td><input type="text" class="form-control" value="${grade.description}" placeholder="Description"></td>
+                    <td><button class="btn btn-danger btn-sm remove-grade"><i class="fas fa-trash"></i></button></td>
+                `;
+                gradeBoundariesTable.appendChild(row);
+            });
+            
+            // Add event listeners to remove buttons
+            document.querySelectorAll('.remove-grade').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    if (gradeBoundariesTable.rows.length > 1) {
+                        this.closest('tr').remove();
+                    }
+                });
+            });
+        }
+
+        // Toggle division system UI
+        function toggleDivisionSystem() {
+            if (divisionSystemType.value === 'custom') {
+                standardDivision.style.display = 'none';
+                customDivision.style.display = 'block';
+                renderDivisionBoundaries();
+            } else {
+                standardDivision.style.display = 'block';
+                customDivision.style.display = 'none';
+            }
+        }
+
+        // Render division boundaries table
+        function renderDivisionBoundaries() {
+            divisionBoundariesTable.innerHTML = '';
+            academicData.settings.divisionSystem.customBoundaries.forEach(division => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><input type="text" class="form-control" value="${division.division}" placeholder="Division"></td>
+                    <td><input type="number" class="form-control" value="${division.min}" placeholder="Min %"></td>
+                    <td><input type="number" class="form-control" value="${division.max}" placeholder="Max %"></td>
+                    <td><input type="text" class="form-control" value="${division.description}" placeholder="Description"></td>
+                    <td><button class="btn btn-danger btn-sm remove-division"><i class="fas fa-trash"></i></button></td>
+                `;
+                divisionBoundariesTable.appendChild(row);
+            });
+            
+            // Add event listeners to remove buttons
+            document.querySelectorAll('.remove-division').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    if (divisionBoundariesTable.rows.length > 1) {
+                        this.closest('tr').remove();
+                    }
+                });
+            });
+        }
+
+        // Toggle GPA system UI
+        function toggleGPASystem() {
+            if (gpaScale.value === 'custom') {
+                standardGPA.style.display = 'none';
+                customGPA.style.display = 'block';
+                renderGPAValues();
+            } else {
+                standardGPA.style.display = 'block';
+                customGPA.style.display = 'none';
+            }
+        }
+
+        // Render GPA values table
+        function renderGPAValues() {
+            gpaValuesTable.innerHTML = '';
+            academicData.settings.gpaSystem.customValues.forEach(gpa => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><input type="text" class="form-control" value="${gpa.grade}" placeholder="Grade"></td>
+                    <td><input type="number" class="form-control" value="${gpa.value}" placeholder="GPA Value" step="0.1"></td>
+                    <td><button class="btn btn-danger btn-sm remove-gpa"><i class="fas fa-trash"></i></button></td>
+                `;
+                gpaValuesTable.appendChild(row);
+            });
+            
+            // Add event listeners to remove buttons
+            document.querySelectorAll('.remove-gpa').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    if (gpaValuesTable.rows.length > 1) {
+                        this.closest('tr').remove();
+                    }
+                });
+            });
+        }
+
+        // Load results based on filters
+        function loadResults() {
+            const selectedClass = classFilter.value;
+            const selectedStream = streamFilter.value;
+            const selectedTerm = termFilter.value;
+            
+            if (!selectedClass || !selectedStream || !selectedTerm) return;
+            
+            const classData = academicData.classes[selectedClass];
+            const students = classData.students;
+            const results = classData.results[selectedTerm][selectedStream];
+            const subjects = classData.subjects;
+            
+            // Clear previous results
+            resultsBody.innerHTML = '';
+            
+            // Update table headers for subjects
+            const subjectHeaders = resultsTable.querySelector('thead tr:first-child');
+            // Clear existing subject headers (keep first 4 columns)
+            while (subjectHeaders.children.length > 4) {
+                subjectHeaders.removeChild(subjectHeaders.lastChild);
+            }
+            
+            // Add subject columns
+            subjects.forEach(subject => {
+                const th = document.createElement('th');
+                th.textContent = subject;
+                subjectHeaders.appendChild(th);
+            });
+            
+            // Process results and calculate totals, averages, etc.
+            const processedResults = students.map((student, index) => {
+                const studentResults = results[index].marks;
+                const total = studentResults.reduce((sum, mark) => sum + mark, 0);
+                const average = total / studentResults.length;
+                const grade = calculateGrade(average);
+                const division = calculateDivision(average);
+                const gpa = calculateGPA(grade);
+                
+                return {
+                    ...student,
+                    marks: studentResults,
+                    total,
+                    average,
+                    grade,
+                    division,
+                    gpa
+                };
+            });
+            
+            // Sort by total marks (descending)
+            processedResults.sort((a, b) => b.total - a.total);
+            
+            // Add ranking
+            processedResults.forEach((result, index) => {
+                result.rank = index + 1;
+            });
+            
+            // Populate table
+            processedResults.forEach(student => {
+                const row = document.createElement('tr');
+                
+                // Rank
+                const rankCell = document.createElement('td');
+                rankCell.textContent = student.rank;
+                rankCell.className = 'rank-cell';
+                row.appendChild(rankCell);
+                
+                // Student ID
+                const idCell = document.createElement('td');
+                idCell.textContent = student.id;
+                row.appendChild(idCell);
+                
+                // Student Name
+                const nameCell = document.createElement('td');
+                nameCell.textContent = student.name;
+                nameCell.className = 'student-info';
+                row.appendChild(nameCell);
+                
+                // Parent Contact
+                const contactCell = document.createElement('td');
+                contactCell.textContent = student.parentPhone;
+                contactCell.className = 'student-info';
+                row.appendChild(contactCell);
+                
+                // Subject marks
+                student.marks.forEach(mark => {
+                    const markCell = document.createElement('td');
+                    markCell.textContent = mark;
+                    
+                    // Color code based on performance
+                    if (mark >= 80) markCell.className = 'excellent';
+                    else if (mark >= 60) markCell.className = 'good';
+                    else if (mark >= 40) markCell.className = 'average';
+                    else markCell.className = 'poor';
+                    
+                    row.appendChild(markCell);
+                });
+                
+                // Total
+                const totalCell = document.createElement('td');
+                totalCell.textContent = student.total;
+                totalCell.className = 'total-cell';
+                row.appendChild(totalCell);
+                
+                // Average
+                const avgCell = document.createElement('td');
+                avgCell.textContent = student.average.toFixed(1);
+                avgCell.className = 'average-cell';
+                row.appendChild(avgCell);
+                
+                // Grade
+                const gradeCell = document.createElement('td');
+                gradeCell.textContent = student.grade;
+                gradeCell.className = 'grade-cell ' + getGradeClass(student.grade);
+                row.appendChild(gradeCell);
+                
+                // Division
+                const divCell = document.createElement('td');
+                divCell.textContent = student.division;
+                divCell.className = 'division-cell ' + getDivisionClass(student.division);
+                row.appendChild(divCell);
+                
+                // GPA
+                const gpaCell = document.createElement('td');
+                gpaCell.textContent = student.gpa;
+                gpaCell.className = 'gpa-cell';
+                row.appendChild(gpaCell);
+                
+                resultsBody.appendChild(row);
+            });
+        }
+
+        // Calculate grade based on average
+        function calculateGrade(average) {
+            const boundaries = academicData.settings.gradingSystem.gradeBoundaries;
+            for (const grade of boundaries) {
+                if (average >= grade.min && average <= grade.max) {
+                    return grade.grade;
+                }
+            }
+            return 'E';
+        }
+
+        // Calculate division based on average
+        function calculateDivision(average) {
+            if (academicData.settings.divisionSystem.type === 'standard') {
+                if (average >= 75) return 'I';
+                if (average >= 60) return 'II';
+                if (average >= 40) return 'III';
+                return 'IV';
+            } else {
+                // Custom division logic would go here
+                return '-';
+            }
+        }
+
+        // Calculate GPA based on grade
+        function calculateGPA(grade) {
+            if (academicData.settings.gpaSystem.scale === '4.0') {
+                switch(grade) {
+                    case 'A': return 4.0;
+                    case 'B': return 3.0;
+                    case 'C': return 2.0;
+                    case 'D': return 1.0;
+                    default: return 0.0;
+                }
+            } else if (academicData.settings.gpaSystem.scale === '5.0') {
+                switch(grade) {
+                    case 'A': return 5.0;
+                    case 'B': return 4.0;
+                    case 'C': return 3.0;
+                    case 'D': return 2.0;
+                    default: return 0.0;
+                }
+            } else {
+                // Custom GPA logic would go here
+                return 0.0;
+            }
+        }
+
+        // Get CSS class for grade
+        function getGradeClass(grade) {
+            switch(grade) {
+                case 'A': return 'excellent';
+                case 'B': return 'good';
+                case 'C': return 'average';
+                default: return 'poor';
+            }
+        }
+
+        // Get CSS class for division
+        function getDivisionClass(division) {
+            switch(division) {
+                case 'I': return 'excellent';
+                case 'II': return 'good';
+                case 'III': return 'average';
+                default: return 'poor';
+            }
+        }
+
+        // Event Listeners
+        document.getElementById('addGradeBtn').addEventListener('click', function() {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><input type="text" class="form-control" placeholder="Grade"></td>
+                <td><input type="number" class="form-control" placeholder="Min %"></td>
+                <td><input type="number" class="form-control" placeholder="Max %"></td>
+                <td><input type="number" class="form-control" placeholder="Points" step="0.1"></td>
+                <td><input type="text" class="form-control" placeholder="Description"></td>
+                <td><button class="btn btn-danger btn-sm remove-grade"><i class="fas fa-trash"></i></button></td>
+            `;
+            gradeBoundariesTable.appendChild(row);
+            row.querySelector('.remove-grade').addEventListener('click', function() {
+                if (gradeBoundariesTable.rows.length > 1) {
+                    row.remove();
+                }
+            });
+        });
+
+        document.getElementById('addDivisionBtn').addEventListener('click', function() {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><input type="text" class="form-control" placeholder="Division"></td>
+                <td><input type="number" class="form-control" placeholder="Min %"></td>
+                <td><input type="number" class="form-control" placeholder="Max %"></td>
+                <td><input type="text" class="form-control" placeholder="Description"></td>
+                <td><button class="btn btn-danger btn-sm remove-division"><i class="fas fa-trash"></i></button></td>
+            `;
+            divisionBoundariesTable.appendChild(row);
+            row.querySelector('.remove-division').addEventListener('click', function() {
+                if (divisionBoundariesTable.rows.length > 1) {
+                    row.remove();
+                }
+            });
+        });
+
+        // Settings tab switching
+        settingsTabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                const tabId = this.getAttribute('data-tab');
+                
+                // Update active tab
+                settingsTabs.forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Update active content
+                settingsContents.forEach(content => content.classList.remove('active'));
+                document.getElementById(`${tabId}Settings`).classList.add('active');
+            });
+        });
+
+        // System type change handlers
+        divisionSystemType.addEventListener('change', toggleDivisionSystem);
+        gpaScale.addEventListener('change', toggleGPASystem);
+
+        // Class filter change handler
+        classFilter.addEventListener('change', function() {
+            const selectedClass = this.value;
+            streamFilter.innerHTML = '<option value="">Select Stream</option>';
+            streamFilter.disabled = !selectedClass;
+            
+            if (selectedClass && academicData.classes[selectedClass]) {
+                academicData.classes[selectedClass].streams.forEach(stream => {
+                    const option = document.createElement('option');
+                    option.value = stream;
+                    option.textContent = `Stream ${stream}`;
+                    streamFilter.appendChild(option);
+                });
+            }
+            
+            termFilter.disabled = true;
+            termFilter.value = "";
+            applyFilterBtn.disabled = true;
+        });
+
+        // Stream filter change handler
+        streamFilter.addEventListener('change', function() {
+            const selectedClass = classFilter.value;
+            const selectedStream = this.value;
+            termFilter.innerHTML = '<option value="">Select Term</option>';
+            termFilter.disabled = !selectedStream;
+            
+            if (selectedClass && selectedStream && academicData.classes[selectedClass].results) {
+                Object.keys(academicData.classes[selectedClass].results).forEach(term => {
+                    if (academicData.classes[selectedClass].results[term][selectedStream]) {
+                        const option = document.createElement('option');
+                        option.value = term;
+                        option.textContent = `Term ${term}`;
+                        termFilter.appendChild(option);
+                    }
+                });
+            }
+            
+            applyFilterBtn.disabled = true;
+        });
+
+        // Term filter change handler
+        termFilter.addEventListener('change', function() {
+            applyFilterBtn.disabled = !this.value;
+        });
+
+        // Apply filters button
+        applyFilterBtn.addEventListener('click', loadResults);
+
+        // Import/Export buttons
+        importResultsBtn.addEventListener('click', function() {
+            importPanel.style.display = 'block';
+            window.scrollTo({ top: importPanel.offsetTop - 20, behavior: 'smooth' });
+        });
+
+        closeImportBtn.addEventListener('click', function() {
+            importPanel.style.display = 'none';
+        });
+
+        // Modal close buttons
+        closeModalBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                previewModal.style.display = 'none';
+            });
+        });
+
+        // Print button
+        document.getElementById('printResultsBtn').addEventListener('click', function() {
+            window.print();
+        });
+
+        // Initialize the application
+        initializeSettings();
+    </script>
+</body>
+</html>

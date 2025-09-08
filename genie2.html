@@ -1,0 +1,1366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Genie New World - Empowering Young Innovators</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #7e22ce;
+            --accent: #06b6d4;
+            --light: #f8fafc;
+            --dark: #0f172a;
+            --success: #10b981;
+            --warning: #f59e0b;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f1f5f9;
+            color: #334155;
+            line-height: 1.6;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Header & Navigation */
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .logo span {
+            color: #fbbf24;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 25px;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .nav-links a:hover, .nav-links a.active {
+            color: #fbbf24;
+        }
+        
+        .auth-buttons {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-outline {
+            border: 2px solid white;
+            color: white;
+            background: transparent;
+        }
+        
+        .btn-outline:hover {
+            background: white;
+            color: var(--primary);
+        }
+        
+        .btn-primary {
+            background: white;
+            color: var(--primary);
+            border: 2px solid white;
+        }
+        
+        .btn-primary:hover {
+            background: transparent;
+            color: white;
+        }
+        
+        /* Page Sections */
+        .page-section {
+            display: none;
+            padding: 80px 0;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .page-section.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* Hero Section */
+        #home {
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 100px 0;
+            text-align: center;
+        }
+        
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+        
+        .hero-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        
+        .btn-large {
+            padding: 15px 30px;
+            font-size: 1.1rem;
+        }
+        
+        .btn-accent {
+            background: var(--accent);
+            border: 2px solid var(--accent);
+            color: white;
+        }
+        
+        .btn-accent:hover {
+            background: transparent;
+            color: var(--accent);
+        }
+        
+        /* Common Section Styles */
+        .section-title {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        
+        .section-title h2 {
+            font-size: 2.5rem;
+            color: var(--dark);
+            margin-bottom: 15px;
+        }
+        
+        .section-title p {
+            font-size: 1.1rem;
+            color: #64748b;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin: 0 auto 20px;
+        }
+        
+        .card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: var(--dark);
+            text-align: center;
+        }
+        
+        /* About Page */
+        .values-list {
+            list-style: none;
+            margin-top: 30px;
+        }
+        
+        .values-list li {
+            padding: 15px;
+            background: var(--light);
+            margin-bottom: 15px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .values-list i {
+            color: var(--primary);
+            margin-right: 15px;
+            font-size: 1.5rem;
+        }
+
+        /* Team Section */
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .team-member {
+            background: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.03);
+            transition: all 0.3s ease;
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+        
+        .team-member:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+        }
+        
+        .team-img {
+            height: 200px;
+            background-color: #e2e8f0;
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .team-info {
+            padding: 25px;
+        }
+        
+        .team-info h3 {
+            font-size: 1.3rem;
+            margin-bottom: 5px;
+            color: var(--dark);
+        }
+        
+        .team-info p {
+            color: var(--secondary);
+            margin-bottom: 15px;
+        }
+        
+        .team-social {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .team-social a {
+            color: var(--secondary);
+            transition: color 0.3s ease;
+        }
+        
+        .team-social a:hover {
+            color: var(--primary);
+        }
+        
+        /* Learning Hub */
+        .topic-filters {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 40px;
+        }
+        
+        .topic-btn {
+            padding: 8px 20px;
+            background: var(--light);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .topic-btn.active, .topic-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+        
+        /* Ideas Lab */
+        .idea-form {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 40px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        
+        .form-group textarea {
+            min-height: 150px;
+        }
+        
+        /* Community Forum */
+        .forum-categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .forum-category {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .forum-category h3 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .forum-category h3 i {
+            margin-right: 10px;
+        }
+        
+        .forum-category ul {
+            list-style: none;
+        }
+        
+        .forum-category li {
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .forum-category li:last-child {
+            border-bottom: none;
+        }
+        
+        /* Resources */
+        .resource-filters {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 40px;
+        }
+        
+        .resource-card {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+        
+        .resource-icon {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-right: 15px;
+            min-width: 40px;
+        }
+        
+        /* Membership */
+        .pricing-plans {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        
+        .pricing-plan {
+            background: white;
+            border-radius: 15px;
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .pricing-plan.popular {
+            border: 2px solid var(--primary);
+            transform: scale(1.05);
+        }
+        
+        .pricing-plan.popular::before {
+            content: "Most Popular";
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: var(--primary);
+            color: white;
+            padding: 5px 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .plan-name {
+            font-size: 1.5rem;
+            color: var(--dark);
+            margin-bottom: 15px;
+        }
+        
+        .plan-price {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+        
+        .plan-features {
+            list-style: none;
+            margin-bottom: 30px;
+        }
+        
+        .plan-features li {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        /* Contact */
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+        }
+        
+        .contact-info {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .contact-info h3 {
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+        
+        .contact-detail {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .contact-detail i {
+            font-size: 1.2rem;
+            color: var(--primary);
+            margin-right: 15px;
+            width: 20px;
+        }
+        
+        /* Footer */
+        footer {
+            background: var(--dark);
+            color: white;
+            padding: 60px 0 30px;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        
+        .footer-column h3 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: #fbbf24;
+        }
+        
+        .footer-column ul {
+            list-style-type: none;
+        }
+        
+        .footer-column ul li {
+            margin-bottom: 10px;
+        }
+        
+        .footer-column a {
+            color: #cbd5e1;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-column a:hover {
+            color: white;
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        
+        .social-links a:hover {
+            background: var(--primary);
+            transform: translateY(-3px);
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .card-grid, .pricing-plans, .forum-categories, .footer-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .pricing-plan.popular {
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header & Navigation -->
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo" onclick="showPage('home')">
+                    <i class="fas fa-lightbulb"></i> Genie<span>NewWorld</span>
+                </div>
+                <div class="nav-links">
+                    <a class="nav-link active" onclick="showPage('home')">Home</a>
+                    <a class="nav-link" onclick="showPage('about')">About</a>
+                    <a class="nav-link" onclick="showPage('learning')">Learning Hub</a>
+                    <a class="nav-link" onclick="showPage('ideas')">Ideas Lab</a>
+                    <a class="nav-link" onclick="showPage('community')">Community</a>
+                    <a class="nav-link" onclick="showPage('resources')">Resources</a>
+                    <a class="nav-link" onclick="showPage('membership')">Membership</a>
+                    <a class="nav-link" onclick="showPage('contact')">Contact</a>
+                </div>
+                <div class="auth-buttons">
+                    <a class="btn btn-outline">Log In</a>
+                    <a class="btn btn-primary">Sign Up Free</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Home Page -->
+    <section id="home" class="page-section active">
+        <div class="container">
+            <div class="hero-content">
+                <h1>Unlock Your Creative Potential & Shape the Future</h1>
+                <p>Genie New World empowers young minds to think critically, innovate fearlessly, and lead the technology revolution through creativity, collaboration, and cutting-edge learning.</p>
+                <div class="hero-buttons">
+                    <a class="btn btn-accent btn-large">Start Your Journey</a>
+                    <a class="btn btn-outline btn-large">Explore Programs</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Page -->
+    <section id="about" class="page-section">
+        <div class="container">
+            <div class="section-title">
+                <h2>About Genie New World</h2>
+                <p>Discover our mission, vision, and the values that drive us to empower young innovators</p>
+            </div>
+            
+            <div class="card">
+                <h3>Our Story</h3>
+                <p>Genie New World was founded in 2020 with a vision to bridge the gap between traditional education and the rapidly evolving technological landscape. We recognized that young students needed more than just textbook knowledge - they needed critical thinking skills, creativity, and innovation mindset to thrive in the new world.</p>
+                <p>Today, we're a global community of 50,000+ young innovators across 120 countries, all working together to shape the future through technology and creative thinking.</p>
+            </div>
+            
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-icon">
+                        <i class="fas fa-eye"></i>
+                    </div>
+                    <h3>Our Vision</h3>
+                    <p>To create a world where every young person is empowered to think critically, create fearlessly, and innovate solutions for global challenges.</p>
+                </div>
+                
+                <div class="card">
+                    <div class="card-icon">
+                        <i class="fas fa-bullseye"></i>
+                    </div>
+                    <h3>Our Mission</h3>
+                    <p>To provide youth with the mindset, skills, community, and resources needed to translate imagination into tangible projects that solve real-world problems.</p>
+                </div>
+                
+                <div class="card">
+                    <div class="card-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3>Our Target</h3>
+                    <p>We work with students aged 15-25 who show passion for technology, creativity, and making a positive impact in their communities.</p>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>Core Values</h3>
+                <ul class="values-list">
+                    <li><i class="fas fa-brain"></i> <strong>Critical Thinking</strong> - We question assumptions and analyze information deeply</li>
+                    <li><i class="fas fa-lightbulb"></i> <strong>Creativity</strong> - We encourage unconventional thinking and new ideas</li>
+                    <li><i class="fas fa-rocket"></i> <strong>Innovation</strong> - We transform ideas into tangible solutions</li>
+                    <li><i class="fas fa-handshake"></i> <strong>Collaboration</strong> - We believe great things happen when we work together</li>
+                    <li><i class="fas fa-heart"></i> <strong>Empowerment</strong> - We equip youth with tools to create change</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section-title">
+                <h2>Our Team</h2>
+                <p>Meet the passionate individuals behind Genie New World</p>
+            </div>
+
+            <div class="team-grid">
+                <div class="team-member">
+                    <div class="team-img" style="background-image: url('https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80')"></div>
+                    <div class="team-info">
+                        <h3>Sarah Johnson</h3>
+                        <p>Founder & CEO</p>
+                        <p>Education innovator with 15+ years experience</p>
+                        <div class="team-social">
+                            <a><i class="fab fa-linkedin"></i></a>
+                            <a><i class="fab fa-twitter"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="team-member">
+                    <div class="team-img" style="background-image: url('https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80')"></div>
+                    <div class="team-info">
+                        <h3>Michael Chen</h3>
+                        <p>CTO</p>
+                        <p>Former tech lead at Google, AI specialist</p>
+                        <div class="team-social">
+                            <a><i class="fab fa-linkedin"></i></a>
+                            <a><i class="fab fa-github"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="team-member">
+                    <div class="team-img" style="background-image: url('https://images.unsplash.com/photo-1614289371518-722f2615943d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80')"></div>
+                    <div class="team-info">
+                        <h3>Priya Patel</h3>
+                        <p>Head of Learning</p>
+                        <p>Curriculum designer and education expert</p>
+                        <div class="team-social">
+                            <a><i class="fab fa-linkedin"></i></a>
+                            <a><i class="fab fa-twitter"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="team-member">
+                    <div class="team-img" style="background-image: url('https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80')"></div>
+                    <div class="team-info">
+                        <h3>David Kim</h3>
+                        <p>Community Manager</p>
+                        <p>Youth advocate and community builder</p>
+                        <div class="team-social">
+                            <a><i class="fab fa-linkedin"></i></a>
+                            <a><i class="fab fa-instagram"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Learning Hub Page -->
+    <section id="learning" class="page-section">
+        <div class="container">
+            <div class="section-title">
+                <h2>Learning Hub</h2>
+                <p>Develop your skills with our curated programs and workshops</p>
+            </div>
+            
+            <div class="topic-filters">
+                <button class="topic-btn active">All Topics</button>
+                <button class="topic-btn">Creativity</button>
+                <button class="topic-btn">Critical Thinking</button>
+                <button class="topic-btn">Innovation</button>
+                <button class="topic-btn">Problem Solving</button>
+                <button class="topic-btn">Leadership</button>
+            </div>
+            
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-icon">
+                        <i class="fas fa-paint-brush"></i>
+                    </div>
+                    <h3>Creative Thinking Workshop</h3>
+                    <p>Monthly sessions to enhance your creative problem-solving abilities and idea generation techniques.</p>
+                    <p><strong>Next session:</strong> August 15, 2023</p>
+                    <a class="btn btn-primary">Join Now</a>
+                </div>
+                
+                <div class="card">
+                    <div class="card-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3>Critical Thinking Masterclass</h3>
+                    <p>Learn how to analyze information, evaluate arguments, and make logical decisions.</p>
+                    <p><strong>Next session:</strong> August 22, 2023</p>
+                    <a class="btn btn-primary">Join Now</a>
+                </div>
+                
+                <div class="card">
+                    <div class="card-icon">
+                        <i class="fas fa-cogs"></i>
+                    </div>
+                    <h3>Innovation Lab</h3>
+                    <p>Hands-on sessions to turn your ideas into real-world projects and prototypes.</p>
+                    <p><strong>Next session:</strong> September 5, 2023</p>
+                    <a class="btn btn-primary">Join Now</a>
+                </div>
+                
+                <div class="card">
+                    <div class="card-icon">
+                        <i class="fas fa-puzzle-piece"></i>
+                    </div>
+                    <h3>Problem Solving Bootcamp</h3>
+                    <p>Develop structured approaches to tackle complex challenges effectively.</p>
+                    <p><strong>Next session:</strong> September 12, 2023</p>
+                    <a class="btn btn-primary">Join Now</a>
+                </div>
+                
+                <div class="card">
+                    <div class="card-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Leadership Development</h3>
+                    <p>Build essential leadership skills to inspire and guide teams effectively.</p>
+                    <p><strong>Next session:</strong> September 19, 2023</p>
+                    <a class="btn btn-primary">Join Now</a>
+                </div>
+                
+                <div class="card">
+                    <div class="card-icon">
+                        <i class="fas fa-project-diagram"></i>
+                    </div>
+                    <h3>From Idea to Project</h3>
+                    <p>Step-by-step guidance on transforming your imagination into executable projects.</p>
+                    <p><strong>Next session:</strong> September 26, 2023</p>
+                    <a class="btn btn-primary">Join Now</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Ideas Lab Page -->
+    <section id="ideas" class="page-section">
+        <div class="container">
+            <div class="section-title">
+                <h2>Ideas Lab</h2>
+                <p>Share your ideas, get feedback, and collaborate with other innovators</p>
+            </div>
+            
+            <div class="idea-form">
+                <h3>Share Your Idea</h3>
+                <div class="form-group">
+                    <label for="idea-title">Idea Title</label>
+                    <input type="text" id="idea-title" placeholder="What's your idea called?">
+                </div>
+                
+                <div class="form-group">
+                    <label for="idea-category">Category</label>
+                    <select id="idea-category">
+                        <option value="">Select a category</option>
+                        <option value="technology">Technology</option>
+                        <option value="education">Education</option>
+                        <option value="environment">Environment</option>
+                        <option value="health">Health</option>
+                        <option value="business">Business</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="idea-description">Describe Your Idea</label>
+                    <textarea id="idea-description" placeholder="Explain your idea in detail..."></textarea>
+                </div>
+                
+                <button class="btn btn-accent">Submit Idea</button>
+            </div>
+            
+            <div class="section-title">
+                <h3>Featured Ideas</h3>
+            </div>
+            
+            <div class="card-grid">
+                <div class="card">
+                    <h3>EduTech Learning Platform</h3>
+                    <p>A gamified learning platform that adapts to each student's learning style and pace.</p>
+                    <div class="idea-meta">
+                        <span><i class="fas fa-user"></i> Sarah M.</span>
+                        <span><i class="fas fa-heart"></i> 124 votes</span>
+                        <span><i class="fas fa-comments"></i> 45 comments</span>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3>Ocean Cleanup Drones</h3>
+                    <p>AI-powered drones that can detect and collect plastic waste from oceans autonomously.</p>
+                    <div class="idea-meta">
+                        <span><i class="fas fa-user"></i> James K.</span>
+                        <span><i class="fas fa-heart"></i> 98 votes</span>
+                        <span><i class="fas fa-comments"></i> 32 comments</span>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3>Community Skill Exchange</h3>
+                    <p>A digital platform where people can teach and learn skills from others in their local community.</p>
+                    <div class="idea-meta">
+                        <span><i class="fas fa-user"></i> Priya T.</span>
+                        <span><i class="fas fa-heart"></i> 87 votes</span>
+                        <span><i class="fas fa-comments"></i> 29 comments</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Community Page -->
+    <section id="community" class="page-section">
+        <div class="container">
+            <div class="section-title">
+                <h2>Community Forum</h2>
+                <p>Connect, collaborate, and grow with fellow innovators</p>
+            </div>
+            
+            <div class="forum-categories">
+                <div class="forum-category">
+                    <h3><i class="fas fa-palette"></i> Arts & Design</h3>
+                    <ul>
+                        <li>Digital Art <span class="badge">234 topics</span></li>
+                        <li>Graphic Design <span class="badge">187 topics</span></li>
+                        <li>Music & Audio <span class="badge">156 topics</span></li>
+                        <li>Creative Writing <span class="badge">201 topics</span></li>
+                    </ul>
+                </div>
+                
+                <div class="forum-category">
+                    <h3><i class="fas fa-laptop-code"></i> Technology</h3>
+                    <ul>
+                        <li>Artificial Intelligence <span class="badge">312 topics</span></li>
+                        <li>Web Development <span class="badge">278 topics</span></li>
+                        <li>Robotics <span class="badge">195 topics</span></li>
+                        <li>Blockchain <span class="badge">167 topics</span></li>
+                    </ul>
+                </div>
+                
+                <div class="forum-category">
+                    <h3><i class="fas fa-lightbulb"></i> Innovation</h3>
+                    <ul>
+                        <li>Startup Ideas <span class="badge">289 topics</span></li>
+                        <li>Product Design <span class="badge">245 topics</span></li>
+                        <li>Prototyping <span class="badge">178 topics</span></li>
+                        <li>Patent Guidance <span class="badge">132 topics</span></li>
+                    </ul>
+                </div>
+                
+                <div class="forum-category">
+                    <h3><i class="fas fa-chart-line"></i> Business</h3>
+                    <ul>
+                        <li>Entrepreneurship <span class="badge">267 topics</span></li>
+                        <li>Marketing <span class="badge">223 topics</span></li>
+                        <li>Funding <span class="badge">189 topics</span></li>
+                        <li>Business Models <span class="badge">176 topics</span></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="section-title">
+                <h3>Recent Discussions</h3>
+            </div>
+            
+            <div class="card">
+                <div class="discussion">
+                    <h4>How to protect intellectual property for student innovators?</h4>
+                    <p>Posted by: Maria L. | 2 hours ago | <span class="badge">12 comments</span></p>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="discussion">
+                    <h4>Looking for team members for sustainability project</h4>
+                    <p>Posted by: Alex T. | 5 hours ago | <span class="badge">7 comments</span></p>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="discussion">
+                    <h4>Best resources to learn about AI ethics?</h4>
+                    <p>Posted by: David K. | 1 day ago | <span class="badge">23 comments</span></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Resources Page -->
+    <section id="resources" class="page-section">
+        <div class="container">
+            <div class="section-title">
+                <h2>Resources Library</h2>
+                <p>Tools, templates, and knowledge to boost your innovation journey</p>
+            </div>
+            
+            <div class="resource-filters">
+                <button class="topic-btn active">All Resources</button>
+                <button class="topic-btn">Articles</button>
+                <button class="topic-btn">Templates</button>
+                <button class="topic-btn">Tools</button>
+                <button class="topic-btn">Books</button>
+                <button class="topic-btn">APIs</button>
+            </div>
+            
+            <div class="card">
+                <h3>Featured Resources</h3>
+                
+                <div class="resource-card">
+                    <div class="resource-icon">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <div class="resource-info">
+                        <h4>Idea Journal Template</h4>
+                        <p>A structured template to capture, develop and refine your ideas systematically.</p>
+                        <a class="btn btn-outline">Download</a>
+                    </div>
+                </div>
+                
+                <div class="resource-card">
+                    <div class="resource-icon">
+                        <i class="fas fa-tools"></i>
+                    </div>
+                    <div class="resource-info">
+                        <h4>Innovation Canvas</h4>
+                        <p>A framework for evaluating ideas based on feasibility, desirability and viability.</p>
+                        <a class="btn btn-outline">Download</a>
+                    </div>
+                </div>
+                
+                <div class="resource-card">
+                    <div class="resource-icon">
+                        <i class="fas fa-laptop-code"></i>
+                    </div>
+                    <div class="resource-info">
+                        <h4>API Starter Kits</h4>
+                        <p>Curated collection of APIs and code samples to kickstart your tech projects.</p>
+                        <a class="btn btn-outline">Explore</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section-title">
+                <h3>Recommended Reading</h3>
+            </div>
+            
+            <div class="card-grid">
+                <div class="card">
+                    <h4>Creative Confidence</h4>
+                    <p>by Tom Kelley & David Kelley</p>
+                    <p>Unleashing the creative potential within us all.</p>
+                </div>
+                
+                <div class="card">
+                    <h4>The Innovator's DNA</h4>
+                    <p>by Jeff Dyer, Hal Gregersen, and Clayton M. Christensen</p>
+                    <p>Mastering the five skills of disruptive innovators.</p>
+                </div>
+                
+                <div class="card">
+                    <h4>Think Like a Genius</h4>
+                    <p>by Todd Siler</p>
+                    <p>Learn creative problem-solving techniques from history's greatest minds.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Membership Page -->
+    <section id="membership" class="page-section">
+        <div class="container">
+            <div class="section-title">
+                <h2>Membership Plans</h2>
+                <p>Choose the plan that works best for your innovation journey</p>
+            </div>
+            
+            <div class="pricing-plans">
+                <div class="pricing-plan">
+                    <div class="plan-name">Explorer</div>
+                    <div class="plan-price">Free</div>
+                    <ul class="plan-features">
+                        <li>Access to basic community forums</li>
+                        <li>Limited learning resources</li>
+                        <li>Basic idea sharing</li>
+                        <li>Monthly newsletter</li>
+                    </ul>
+                    <a class="btn btn-outline">Current Plan</a>
+                </div>
+                
+                <div class="pricing-plan popular">
+                    <div class="plan-name">Innovator</div>
+                    <div class="plan-price">$9<span>/month</span></div>
+                    <ul class="plan-features">
+                        <li>Full access to all learning hub content</li>
+                        <li>Advanced idea lab features</li>
+                        <li>Priority support</li>
+                        <li>Exclusive workshops</li>
+                        <li>Mentorship matching</li>
+                    </ul>
+                    <a class="btn btn-accent">Upgrade Now</a>
+                </div>
+                
+                <div class="pricing-plan">
+                    <div class="plan-name">Visionary</div>
+                    <div class="plan-price">$24<span>/month</span></div>
+                    <ul class="plan-features">
+                        <li>Everything in Innovator plan</li>
+                        <li>1-on-1 mentorship sessions</li>
+                        <li>Project funding opportunities</li>
+                        <li>Early access to new features</li>
+                        <li>Genius profile showcase</li>
+                    </ul>
+                    <a class="btn btn-outline">Choose Plan</a>
+                </div>
+            </div>
+            
+            <div class="section-title">
+                <h3>Create Your Genius Profile</h3>
+                <p>Showcase your ideas, projects, and achievements to the world</p>
+            </div>
+            
+            <div class="card">
+                <div class="form-group">
+                    <label for="profile-name">Display Name</label>
+                    <input type="text" id="profile-name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="profile-bio">Bio</label>
+                    <textarea id="profile-bio" placeholder="Tell us about yourself and your interests..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="profile-skills">Skills & Interests</label>
+                    <input type="text" id="profile-skills" placeholder="Add skills separated by commas">
+                </div>
+                
+                <button class="btn btn-accent">Create Profile</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Page -->
+    <section id="contact" class="page-section">
+        <div class="container">
+            <div class="section-title">
+                <h2>Contact Us</h2>
+                <p>Get in touch with our team for questions, partnerships, or support</p>
+            </div>
+            
+            <div class="contact-grid">
+                <div class="contact-info">
+                    <h3>Get In Touch</h3>
+                    
+                    <div class="contact-detail">
+                        <i class="fas fa-envelope"></i>
+                        <div>
+                            <h4>Email</h4>
+                            <p>info@genienewworld.org</p>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-detail">
+                        <i class="fas fa-phone"></i>
+                        <div>
+                            <h4>Phone</h4>
+                            <p>+1 (555) 123-4567</p>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-detail">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <div>
+                            <h4>Address</h4>
+                            <p>Innovation Center, Tech District</p>
+                            <p>San Francisco, CA 94105</p>
+                        </div>
+                    </div>
+                    
+                    <div class="social-links">
+                        <a><i class="fab fa-facebook-f"></i></a>
+                        <a><i class="fab fa-twitter"></i></a>
+                        <a><i class="fab fa-instagram"></i></a>
+                        <a><i class="fab fa-linkedin-in"></i></a>
+                        <a><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                
+                <div class="contact-info">
+                    <h3>Send Us a Message</h3>
+                    
+                    <div class="form-group">
+                        <label for="contact-name">Your Name</label>
+                        <input type="text" id="contact-name">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="contact-email">Email Address</label>
+                        <input type="email" id="contact-email">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="contact-subject">Subject</label>
+                        <input type="text" id="contact-subject">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="contact-message">Message</label>
+                        <textarea id="contact-message" rows="5"></textarea>
+                    </div>
+                    
+                    <button class="btn btn-accent">Send Message</button>
+                </div>
+            </div>
+            
+            <div class="section-title">
+                <h3>Subscribe to Our Newsletter</h3>
+                <p>Get the latest updates on programs, events, and innovation resources</p>
+            </div>
+            
+            <div class="card">
+                <div class="form-group">
+                    <label for="newsletter-email">Email Address</label>
+                    <input type="email" id="newsletter-email" placeholder="Enter your email">
+                </div>
+                <button class="btn btn-accent">Subscribe</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>Genie New World</h3>
+                    <p>Empowering the next generation of innovators, thinkers, and creators to lead the technology revolution.</p>
+                    <div class="social-links">
+                        <a><i class="fab fa-facebook-f"></i></a>
+                        <a><i class="fab fa-twitter"></i></a>
+                        <a><i class="fab fa-instagram"></i></a>
+                        <a><i class="fab fa-linkedin-in"></i></a>
+                        <a><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h3>Explore</h3>
+                    <ul>
+                        <li><a onclick="showPage('home')">Home</a></li>
+                        <li><a onclick="showPage('about')">About Us</a></li>
+                        <li><a onclick="showPage('learning')">Learning Hub</a></li>
+                        <li><a onclick="showPage('ideas')">Ideas Lab</a></li>
+                        <li><a onclick="showPage('community')">Community Forum</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Resources</h3>
+                    <ul>
+                        <li><a onclick="showPage('resources')">Blog & Articles</a></li>
+                        <li><a onclick="showPage('resources')">Innovation Tools</a></li>
+                        <li><a onclick="showPage('resources')">Templates</a></li>
+                        <li><a onclick="showPage('resources')">Recommended Books</a></li>
+                        <li><a onclick="showPage('resources')">API Resources</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Support</h3>
+                    <ul>
+                        <li><a onclick="showPage('contact')">Contact Us</a></li>
+                        <li><a onclick="showPage('membership')">Membership</a></li>
+                        <li><a>FAQs</a></li>
+                        <li><a>Privacy Policy</a></li>
+                        <li><a>Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2023 Genie New World (GNW). All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Function to show the selected page and hide others
+        function showPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page-section').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // Show the selected page
+            document.getElementById(pageId).classList.add('active');
+            
+            // Update active navigation link
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            // Add 'active' class to the clicked navigation link
+            event.target.classList.add('active');
+            
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+        
+        // Add interactivity to buttons and cards
+        document.addEventListener('DOMContentLoaded', function() {
+            const buttons = document.querySelectorAll('.btn');
+            
+            buttons.forEach(button => {
+                button.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-3px)';
+                    this.style.boxShadow = '0 10px 20px rgba(0, 0, 0, 0.2)';
+                });
+                
+                button.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = 'none';
+                });
+            });
+            
+            // Feature card animation
+            const cards = document.querySelectorAll('.card');
+            
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-5px)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+            
+            // Topic filter buttons
+            const topicButtons = document.querySelectorAll('.topic-btn');
+            
+            topicButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    topicButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
