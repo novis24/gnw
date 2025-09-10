@@ -44,75 +44,75 @@
         }
         
         /* ===== HEADER & NAVIGATION ===== */
-        header {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            padding: 15px 0;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
+header {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    padding: 15px 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
 
-        nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 
-        .logo {
-            font-size: 1.8rem;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-            margin-right: auto; /* This ensures logo stays on the left */
-        }
+.logo {
+    font-size: 1.8rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    margin-right: auto; /* This ensures logo stays on the left */
+}
 
-        .logo span {
-            color: #fbbf24;
-        }
+.logo span {
+    color: #fbbf24;
+}
 
-        .nav-links {
-            display: flex;
-            gap: 25px;
-            margin: 0 auto; /* This centers the navigation links */
-        }
+.nav-links {
+    display: flex;
+    gap: 25px;
+    margin: 0 auto; /* This centers the navigation links */
+}
 
-        .nav-links a {
-            color: white;
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            position: relative;
-            padding: 5px 0;
-        }
+.nav-links a {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    padding: 5px 0;
+}
 
-        .nav-links a::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background-color: #fbbf24;
-            transition: width 0.3s ease;
-        }
+.nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: #fbbf24;
+    transition: width 0.3s ease;
+}
 
-        .nav-links a:hover::after, .nav-links a.active::after {
-            width: 100%;
-        }
+.nav-links a:hover::after, .nav-links a.active::after {
+    width: 100%;
+}
 
-        .nav-links a:hover, .nav-links a.active {
-            color: #fbbf24;
-        }
+.nav-links a:hover, .nav-links a.active {
+    color: #fbbf24;
+}
 
-        .auth-buttons {
-            display: flex;
-            gap: 15px;
-            margin-left: auto; /* This pushes auth buttons to the right */
-        }
+.auth-buttons {
+    display: flex;
+    gap: 15px;
+    margin-left: auto; /* This pushes auth buttons to the right */
+}
         
         /* ===== PAGE SECTIONS ===== */
         .page-section {
@@ -284,7 +284,7 @@
         .testimonial-author {
             display: flex;
             align-items: center;
-            color: #250144;
+            color: #0f172a;
         }
         
         .testimonial-avatar {
@@ -306,12 +306,11 @@
             font-size: 2.5rem;
             color: var(--dark);
             margin-bottom: 15px;
-            color: #686768;
         }
         
         .section-title p {
             font-size: 1.1rem;
-            color: #9da4ad;
+            color: #64748b;
             max-width: 700px;
             margin: 0 auto;
         }
@@ -354,14 +353,14 @@
             color: var(--dark);
             text-align: center;
         }
-
+        
         .card p {
             font-size: 0.9rem; /* smaller, readable inside cards */
             font-family: "Poppins", "Helvetica Neue", Helvetica, Arial, sans-serif; /* clean & slightly fancy */
             color: #0f172a; /* keeps your original color */
             line-height: 1.4; /* improves readability */
         }
-        
+
         /* ===== ABOUT PAGE ===== */
         .values-list {
             list-style: none;
@@ -448,7 +447,7 @@
             transition: all 0.3s ease;
             width: 35px;
             height: 35px;
-            borderRadius: 50%;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -458,70 +457,6 @@
         .team-social a:hover {
             color: white;
             background: var(--primary);
-        }
-        
-        /* ===== SCROLLING TEAM SECTION ===== */
-        .scrolling-team-container {
-            margin: 40px 0;
-            overflow: hidden;
-            position: relative;
-            padding: 20px 0;
-        }
-        
-        .scrolling-team-wrapper {
-            display: flex;
-            animation: scrollTeam 30s linear infinite;
-            width: calc(250px * 20); /* Width of each card multiplied by number of cards */
-        }
-        
-        .scrolling-team-member {
-            flex: 0 0 250px;
-            margin: 0 15px;
-            background: var(--card-bg);
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-            border: 1px solid var(--border);
-            text-align: center;
-        }
-        
-        @keyframes scrollTeam {
-            0% {
-                transform: translateX(0);
-            }
-            100% {
-                transform: translateX(calc(-250px * 10)); /* Move by half the total width */
-            }
-        }
-        
-        .scrolling-team-member:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-        }
-        
-        .scrolling-team-img {
-            height: 200px;
-            background-color: #e2e8f0;
-            background-size: cover;
-            background-position: center;
-        }
-        
-        .scrolling-team-info {
-            padding: 20px;
-        }
-        
-        .scrolling-team-info h3 {
-            font-size: 1.2rem;
-            margin-bottom: 5px;
-            color: var(--dark);
-        }
-        
-        .scrolling-team-info p.role {
-            color: var(--primary);
-            font-weight: 600;
-            margin-bottom: 5px;
-            font-size: 0.9rem;
         }
         
         /* ===== LEARNING HUB ===== */
@@ -546,14 +481,6 @@
         .topic-btn.active, .topic-btn:hover {
             background: var(--primary);
             color: white;
-        }
-        
-        .learning-card {
-            display: none;
-        }
-        
-        .learning-card.active {
-            display: block;
         }
         
         /* ===== IDEAS LAB ===== */
@@ -618,7 +545,6 @@
         
         .forum-category h3 i {
             margin-right: 10px;
-            font-size: 1.2rem;
         }
         
         .forum-category ul {
@@ -688,14 +614,6 @@
             color: var(--dark);
         }
         
-        .resource-item {
-            display: none;
-        }
-        
-        .resource-item.active {
-            display: flex;
-        }
-        
         /* ===== MEMBERSHIP ===== */
         .pricing-plans {
             display: grid;
@@ -711,12 +629,6 @@
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
             position: relative;
             overflow: hidden;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .pricing-plan:hover {
-            transform: translateY(-5px);
         }
         
         .pricing-plan.popular {
@@ -929,10 +841,6 @@
             .contact-grid {
                 gap: 20px;
             }
-            
-            .scrolling-team-member {
-                flex: 0 0 200px;
-            }
         }
         
         @media (max-width: 480px) {
@@ -955,11 +863,6 @@
             .team-info {
                 padding: 15px;
             }
-            
-            .scrolling-team-member {
-                flex: 0 0 170px;
-                margin: 0 10px;
-            }
         }
     </style>
 </head>
@@ -969,8 +872,8 @@
         <div class="container">
             <nav>
                 <div class="logo" onclick="showPage('home')">
-                    <i class="fas fa-lightbulb"></i> Genie<span>NewWorld</span>
-                </div>
+                    <i class="fas fa-lightbulb"></i> G<span>NewWorld</span>
+                </div></br></br></br>
                 <div class="nav-links">
                     <a class="nav-link active" onclick="showPage('home')">Home</a>
                     <a class="nav-link" onclick="showPage('about')">About</a>
@@ -1002,6 +905,30 @@
             </div>
         </div>
         
+        <!-- Stats Section
+        <div class="stats-section">
+            <div class="container">
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-number">50,000+</div>
+                        <div class="stat-label">Young Innovators</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">120+</div>
+                        <div class="stat-label">Countries</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">500+</div>
+                        <div class="stat-label">Projects</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">95%</div>
+                        <div class="stat-label">Satisfaction Rate</div>
+                    </div>
+                </div>
+            </div>
+        </div> -->
+        
         <!-- Features Section -->
         <div class="container" style="padding: 80px 0;">
             <div class="section-title">
@@ -1014,7 +941,7 @@
                     <div class="card-icon">
                         <i class="fas fa-brain"></i>
                     </div>
-                    <h3>Critical Thinking</h3>
+                    <h3>Critical ddThinking</h3>
                     <p>Develop analytical skills to evaluate information, identify patterns, and make informed decisions in complex situations.</p>
                 </div>
                 
@@ -1047,8 +974,8 @@
                 <div class="testimonial-grid">
                     <div class="testimonial-card">
                         <div class="testimonial-text">
-                            "Genie New World completely changed my perspective on problem-solving. The critical thinking framework I learned helped me develop a recycling app that's now being used in my entire city!"
-                        </div>
+                            <p>"Genie New World completely changed my perspective on problem-solving. The critical thinking framework I learned helped me develop a recycling app that's now being used in my entire city!"
+                        </p></div>
                         <div class="testimonial-author">
                             <div class="testimonial-avatar" style="background-image: url('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80')"></div>
                             <div>
@@ -1060,9 +987,9 @@
                     
                     <div class="testimonial-card">
                         <div class="testimonial-text">
-                            "The innovation workshops helped me turn my simple idea into a functional prototype. I never thought I could build something that actually solves a real healthcare problem!"
+                            <p>"The innovation workshops helped me turn my simple idea into a functional prototype. I never thought I could build something that actually solves a real healthcare problem!"
                         </div>
-                        <div class="testimonial-author">
+                        <div class="testimonial-author"></p>
                             <div class="testimonial-avatar" style="background-image: url('https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80')"></div>
                             <div>
                                 <div>Sarah M.</div>
@@ -1197,18 +1124,6 @@
                     </div>
                 </div>
             </div>
-            
-            <!-- Scrolling Team Members Section -->
-            <div class="section-title">
-                <h2>Our Global Team</h2>
-                <p>Meet more of our talented team members from around the world</p>
-            </div>
-            
-            <div class="scrolling-team-container">
-                <div class="scrolling-team-wrapper">
-                    <!-- These will be duplicated in JavaScript to create seamless scrolling -->
-                </div>
-            </div>
         </div>
     </section>
 
@@ -1221,16 +1136,16 @@
             </div>
             
             <div class="topic-filters">
-                <button class="topic-btn active" data-category="all">All Topics</button>
-                <button class="topic-btn" data-category="creativity">Creativity</button>
-                <button class="topic-btn" data-category="critical-thinking">Critical Thinking</button>
-                <button class="topic-btn" data-category="innovation">Innovation</button>
-                <button class="topic-btn" data-category="problem-solving">Problem Solving</button>
-                <button class="topic-btn" data-category="leadership">Leadership</button>
+                <button class="topic-btn active">All Topics</button>
+                <button class="topic-btn">Creativity</button>
+                <button class="topic-btn">Critical Thinking</button>
+                <button class="topic-btn">Innovation</button>
+                <button class="topic-btn">Problem Solving</button>
+                <button class="topic-btn">Leadership</button>
             </div>
             
             <div class="card-grid">
-                <div class="card learning-card" data-categories="creativity">
+                <div class="card">
                     <div class="card-icon">
                         <i class="fas fa-paint-brush"></i>
                     </div>
@@ -1240,7 +1155,7 @@
                     <a class="btn btn-primary">Join Now</a>
                 </div>
                 
-                <div class="card learning-card" data-categories="critical-thinking">
+                <div class="card">
                     <div class="card-icon">
                         <i class="fas fa-brain"></i>
                     </div>
@@ -1250,7 +1165,7 @@
                     <a class="btn btn-primary">Join Now</a>
                 </div>
                 
-                <div class="card learning-card" data-categories="innovation">
+                <div class="card">
                     <div class="card-icon">
                         <i class="fas fa-cogs"></i>
                     </div>
@@ -1260,7 +1175,7 @@
                     <a class="btn btn-primary">Join Now</a>
                 </div>
                 
-                <div class="card learning-card" data-categories="problem-solving">
+                <div class="card">
                     <div class="card-icon">
                         <i class="fas fa-puzzle-piece"></i>
                     </div>
@@ -1270,7 +1185,7 @@
                     <a class="btn btn-primary">Join Now</a>
                 </div>
                 
-                <div class="card learning-card" data-categories="leadership">
+                <div class="card">
                     <div class="card-icon">
                         <i class="fas fa-chart-line"></i>
                     </div>
@@ -1280,33 +1195,13 @@
                     <a class="btn btn-primary">Join Now</a>
                 </div>
                 
-                <div class="card learning-card" data-categories="innovation">
+                <div class="card">
                     <div class="card-icon">
                         <i class="fas fa-project-diagram"></i>
                     </div>
                     <h3>From Idea to Project</h3>
                     <p>Step-by-step guidance on transforming your imagination into executable projects.</p>
                     <p><strong>Next session:</strong> September 26, 2023</p>
-                    <a class="btn btn-primary">Join Now</a>
-                </div>
-                
-                <div class="card learning-card" data-categories="creativity">
-                    <div class="card-icon">
-                        <i class="fas fa-magic"></i>
-                    </div>
-                    <h3>Design Thinking Workshop</h3>
-                    <p>Learn human-centered design approaches to solve complex problems creatively.</p>
-                    <p><strong>Next session:</strong> October 3, 2023</p>
-                    <a class="btn btn-primary">Join Now</a>
-                </div>
-                
-                <div class="card learning-card" data-categories="critical-thinking">
-                    <div class="card-icon">
-                        <i class="fas fa-chart-bar"></i>
-                    </div>
-                    <h3>Data Analysis Fundamentals</h3>
-                    <p>Develop skills to interpret data, identify patterns, and make data-driven decisions.</p>
-                    <p><strong>Next session:</strong> October 10, 2023</p>
                     <a class="btn btn-primary">Join Now</a>
                 </div>
             </div>
@@ -1473,18 +1368,18 @@
             </div>
             
             <div class="resource-filters">
-                <button class="topic-btn active" data-resource="all">All Resources</button>
-                <button class="topic-btn" data-resource="articles">Articles</button>
-                <button class="topic-btn" data-resource="templates">Templates</button>
-                <button class="topic-btn" data-resource="tools">Tools</button>
-                <button class="topic-btn" data-resource="books">Books</button>
-                <button class="topic-btn" data-resource="apis">APIs</button>
+                <button class="topic-btn active">All Resources</button>
+                <button class="topic-btn">Articles</button>
+                <button class="topic-btn">Templates</button>
+                <button class="topic-btn">Tools</button>
+                <button class="topic-btn">Books</button>
+                <button class="topic-btn">APIs</button>
             </div>
             
             <div class="card">
                 <h3>Featured Resources</h3>
                 
-                <div class="resource-item" data-resource="templates">
+                <div class="resource-card">
                     <div class="resource-icon">
                         <i class="fas fa-book"></i>
                     </div>
@@ -1495,7 +1390,7 @@
                     </div>
                 </div>
                 
-                <div class="resource-item" data-resource="templates">
+                <div class="resource-card">
                     <div class="resource-icon">
                         <i class="fas fa-tools"></i>
                     </div>
@@ -1506,7 +1401,7 @@
                     </div>
                 </div>
                 
-                <div class="resource-item" data-resource="apis">
+                <div class="resource-card">
                     <div class="resource-icon">
                         <i class="fas fa-laptop-code"></i>
                     </div>
@@ -1514,39 +1409,6 @@
                         <h4>API Starter Kits</h4>
                         <p>Curated collection of APIs and code samples to kickstart your tech projects.</p>
                         <a class="btn btn-outline">Explore</a>
-                    </div>
-                </div>
-                
-                <div class="resource-item" data-resource="articles">
-                    <div class="resource-icon">
-                        <i class="fas fa-newspaper"></i>
-                    </div>
-                    <div class="resource-info">
-                        <h4>Creative Thinking Techniques</h4>
-                        <p>Comprehensive guide to 20+ techniques for boosting your creative thinking.</p>
-                        <a class="btn btn-outline">Read Article</a>
-                    </div>
-                </div>
-                
-                <div class="resource-item" data-resource="tools">
-                    <div class="resource-icon">
-                        <i class="fas fa-calculator"></i>
-                    </div>
-                    <div class="resource-info">
-                        <h4>Project ROI Calculator</h4>
-                        <p>Tool to estimate the potential return on investment for your innovation projects.</p>
-                        <a class="btn btn-outline">Use Tool</a>
-                    </div>
-                </div>
-                
-                <div class="resource-item" data-resource="books">
-                    <div class="resource-icon">
-                        <i class="fas fa-book-open"></i>
-                    </div>
-                    <div class="resource-info">
-                        <h4>Innovation Reading List</h4>
-                        <p>Curated collection of must-read books on innovation and creative thinking.</p>
-                        <a class="btn btn-outline">View List</a>
                     </div>
                 </div>
             </div>
@@ -1586,7 +1448,7 @@
             </div>
             
             <div class="pricing-plans">
-                <div class="pricing-plan" data-plan="explorer">
+                <div class="pricing-plan">
                     <div class="plan-name">Explorer</div>
                     <div class="plan-price">Free</div>
                     <ul class="plan-features">
@@ -1598,7 +1460,7 @@
                     <a class="btn btn-outline">Current Plan</a>
                 </div>
                 
-                <div class="pricing-plan popular" data-plan="innovator">
+                <div class="pricing-plan popular">
                     <div class="plan-name">Innovator</div>
                     <div class="plan-price">$9<span>/month</span></div>
                     <ul class="plan-features">
@@ -1611,7 +1473,7 @@
                     <a class="btn btn-accent">Upgrade Now</a>
                 </div>
                 
-                <div class="pricing-plan" data-plan="visionary">
+                <div class="pricing-plan">
                     <div class="plan-name">Visionary</div>
                     <div class="plan-price">$24<span>/month</span></div>
                     <ul class="plan-features">
@@ -1724,7 +1586,7 @@
                 </div>
             </div>
             
-            <div class="section-title"></br>
+            <div class="section-title">
                 <h3>Subscribe to Our Newsletter</h3>
                 <p>Get the latest updates on programs, events, and innovation resources</p>
             </div>
@@ -1786,7 +1648,7 @@
                 </div>
             </div>
             <div class="copyright">
-                <p>&copy; 2025 Powered by NovisTech. All rights reserved.</p>
+                <p>&copy; 2023 Genie New World (GNW). All rights reserved.</p>
             </div>
         </div>
     </footer>
@@ -1853,154 +1715,16 @@
                 });
             });
             
-            // Topic filter buttons - Learning Hub
-            const topicButtons = document.querySelectorAll('.topic-filters .topic-btn');
+            // Topic filter buttons
+            const topicButtons = document.querySelectorAll('.topic-btn');
             
             topicButtons.forEach(button => {
                 button.addEventListener('click', function() {
-                    const category = this.getAttribute('data-category');
-                    
                     topicButtons.forEach(btn => btn.classList.remove('active'));
                     this.classList.add('active');
-                    
-                    // Filter learning cards
-                    const learningCards = document.querySelectorAll('.learning-card');
-                    learningCards.forEach(card => {
-                        if (category === 'all' || card.getAttribute('data-categories').includes(category)) {
-                            card.style.display = 'block';
-                        } else {
-                            card.style.display = 'none';
-                        }
-                    });
                 });
             });
-            
-            // Resource filter buttons - Resources Library
-            const resourceButtons = document.querySelectorAll('.resource-filters .topic-btn');
-            
-            resourceButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const resourceType = this.getAttribute('data-resource');
-                    
-                    resourceButtons.forEach(btn => btn.classList.remove('active'));
-                    this.classList.add('active');
-                    
-                    // Filter resource items
-                    const resourceItems = document.querySelectorAll('.resource-item');
-                    resourceItems.forEach(item => {
-                        if (resourceType === 'all' || item.getAttribute('data-resource') === resourceType) {
-                            item.style.display = 'flex';
-                        } else {
-                            item.style.display = 'none';
-                        }
-                    });
-                });
-            });
-            
-            // Membership plan selection
-            const pricingPlans = document.querySelectorAll('.pricing-plan');
-            
-            pricingPlans.forEach(plan => {
-                plan.addEventListener('click', function() {
-                    const planType = this.getAttribute('data-plan');
-                    
-                    pricingPlans.forEach(p => p.classList.remove('popular'));
-                    this.classList.add('popular');
-                    
-                    // Here you would typically handle the plan selection logic
-                    console.log('Selected plan:', planType);
-                    
-                    // Update button texts
-                    document.querySelectorAll('.pricing-plan .btn').forEach(btn => {
-                        btn.textContent = 'Choose Plan';
-                        btn.className = 'btn btn-outline';
-                    });
-                    
-                    const selectedBtn = this.querySelector('.btn');
-                    selectedBtn.textContent = planType === 'explorer' ? 'Current Plan' : 'Upgrade Now';
-                    if (planType !== 'explorer') {
-                        selectedBtn.className = 'btn btn-accent';
-                    }
-                });
-            });
-            
-            // Create scrolling team members
-            createScrollingTeamMembers();
         });
-        
-        // Function to create the scrolling team members
-        function createScrollingTeamMembers() {
-            const teamMembers = [
-                {
-                    name: "Alex Morgan",
-                    role: "AI Specialist",
-                    image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
-                },
-                {
-                    name: "Lisa Zhang",
-                    role: "UX Designer",
-                    image: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
-                },
-                {
-                    name: "Marcus Johnson",
-                    role: "Data Scientist",
-                    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
-                },
-                {
-                    name: "Sophia Williams",
-                    role: "Product Manager",
-                    image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
-                },
-                {
-                    name: "Daniel Lee",
-                    role: "Software Engineer",
-                    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
-                },
-                {
-                    name: "Emma Thompson",
-                    role: "Content Strategist",
-                    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
-                },
-                {
-                    name: "Ryan Chen",
-                    role: "DevOps Engineer",
-                    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
-                },
-                {
-                    name: "Olivia Martinez",
-                    role: "Community Lead",
-                    image: "https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
-                },
-                {
-                    name: "James Wilson",
-                    role: "Backend Developer",
-                    image: "https://images.unsplash.com/photo-1519345182560-3f2917c472ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
-                },
-                {
-                    name: "Ava Anderson",
-                    role: "Graphic Designer",
-                    image: "https://images.unsplash.com/photo-1517282009859-f000ec3b26fe?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
-                }
-            ];
-            
-            const scrollingWrapper = document.querySelector('.scrolling-team-wrapper');
-            
-            // Add team members twice to create seamless scrolling
-            for (let i = 0; i < 2; i++) {
-                teamMembers.forEach(member => {
-                    const teamMemberElement = document.createElement('div');
-                    teamMemberElement.className = 'scrolling-team-member';
-                    teamMemberElement.innerHTML = `
-                        <div class="scrolling-team-img" style="background-image: url('${member.image}')"></div>
-                        <div class="scrolling-team-info">
-                            <h3>${member.name}</h3>
-                            <p class="role">${member.role}</p>
-                        </div>
-                    `;
-                    scrollingWrapper.appendChild(teamMemberElement);
-                });
-            }
-        }
     </script>
 </body>
 </html>
