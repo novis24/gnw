@@ -1,0 +1,1801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ResearchFlow | Advanced Research Companion</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Custom Styles */
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --secondary: #6366f1;
+            --light: #f8fafc;
+            --dark: #1e293b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .section {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+            flex: 1;
+        }
+        
+        .section.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .nav-item.active {
+            border-left: 4px solid var(--primary);
+            background-color: #eff6ff;
+            color: var(--primary);
+        }
+        
+        .task-completed {
+            text-decoration: line-through;
+            color: #9ca3af;
+        }
+        
+        .file-card:hover {
+            transform: translateY(-5px);
+            transition: transform 0.2s ease;
+        }
+        
+        .search-result:hover {
+            background-color: #f3f4f6;
+        }
+        
+        .note-card {
+            transition: all 0.2s ease;
+        }
+        
+        .note-card:hover {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        .data-cell {
+            min-height: 40px;
+        }
+        
+        .loader {
+            display: none;
+        }
+        
+        .loading .content {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        
+        .loading .loader {
+            display: flex;
+        }
+        
+        .sidebar {
+            width: 260px;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar.collapsed {
+            width: 70px;
+        }
+        
+        .main-content {
+            margin-left: 260px;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        
+        .main-content.expanded {
+            margin-left: 70px;
+        }
+        
+        .logo-text {
+            transition: opacity 0.3s ease;
+        }
+        
+        .sidebar.collapsed .logo-text {
+            opacity: 0;
+            display: none;
+        }
+        
+        .nav-label {
+            transition: opacity 0.3s ease;
+        }
+        
+        .sidebar.collapsed .nav-label {
+            opacity: 0;
+            display: none;
+        }
+        
+        .user-info {
+            transition: opacity 0.3s ease;
+        }
+        
+        .sidebar.collapsed .user-info {
+            opacity: 0;
+            display: none;
+        }
+        
+        .content-area {
+            flex: 1;
+        }
+        
+        footer {
+            margin-top: auto;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background-color: white;
+            border-radius: 0.5rem;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .rating-stars {
+            color: #f59e0b;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .badge-completed {
+            background-color: #dcfce7;
+            color: #16a34a;
+        }
+        
+        .badge-pending {
+            background-color: #fef3c7;
+            color: #d97706;
+        }
+        
+        .badge-inprogress {
+            background-color: #dbeafe;
+            color: #2563eb;
+        }
+        
+        .badge-public {
+            background-color: #dbeafe;
+            color: #2563eb;
+        }
+        
+        .badge-private {
+            background-color: #f3e8ff;
+            color: #9333ea;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation & Layout Structure -->
+    <div class="flex">
+        <!-- Sidebar -->
+        <div class="sidebar bg-white shadow-md h-screen fixed z-10">
+            <div class="p-5 border-b flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold mr-3">
+                        RF
+                    </div>
+                    <div class="logo-text">
+                        <h1 class="text-xl font-bold text-blue-600">ResearchFlow</h1>
+                        <p class="text-xs text-gray-500">Research Companion</p>
+                    </div>
+                </div>
+                <button id="toggleSidebar" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+            <nav class="mt-5">
+                <a href="#dashboard" class="nav-item w-full flex items-center p-4 text-gray-700 hover:bg-blue-50 hover:text-blue-600">
+                    <i class="fas fa-grid mr-3"></i>
+                    <span class="nav-label">Dashboard</span>
+                </a>
+                <a href="#data" class="nav-item w-full flex items-center p-4 text-gray-700 hover:bg-blue-50 hover:text-blue-600">
+                    <i class="fas fa-table mr-3"></i>
+                    <span class="nav-label">Data Workspace</span>
+                </a>
+                <a href="#files" class="nav-item w-full flex items-center p-4 text-gray-700 hover:bg-blue-50 hover:text-blue-600">
+                    <i class="fas fa-folder mr-3"></i>
+                    <span class="nav-label">File Manager</span>
+                </a>
+                <a href="#notes" class="nav-item w-full flex items-center p-4 text-gray-700 hover:bg-blue-50 hover:text-blue-600">
+                    <i class="fas fa-book mr-3"></i>
+                    <span class="nav-label">Research Journal</span>
+                </a>
+                <a href="#tasks" class="nav-item w-full flex items-center p-4 text-gray-700 hover:bg-blue-50 hover:text-blue-600">
+                    <i class="fas fa-list-check mr-3"></i>
+                    <span class="nav-label">Task Manager</span>
+                </a>
+                <a href="#search" class="nav-item w-full flex items-center p-4 text-gray-700 hover:bg-blue-50 hover:text-blue-600">
+                    <i class="fas fa-search mr-3"></i>
+                    <span class="nav-label">Research Search</span>
+                </a>
+                <a href="#collab" class="nav-item w-full flex items-center p-4 text-gray-700 hover:bg-blue-50 hover:text-blue-600">
+                    <i class="fas fa-users mr-3"></i>
+                    <span class="nav-label">Collaboration</span>
+                </a>
+                <a href="#settings" class="nav-item w-full flex items-center p-4 text-gray-700 hover:bg-blue-50 hover:text-blue-600">
+                    <i class="fas fa-cog mr-3"></i>
+                    <span class="nav-label">Settings</span>
+                </a>
+            </nav>
+            <div class="absolute bottom-0 w-full p-4 border-t bg-white">
+                <div class="flex items-center cursor-pointer" id="profileButton">
+                    <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold">
+                        JD
+                    </div>
+                    <div class="user-info ml-3">
+                        <p class="text-sm font-medium">Dr. Jane Doe</p>
+                        <p class="text-xs text-gray-500">Researcher</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content flex-1">
+            <!-- Header -->
+            <header class="bg-white shadow-sm">
+                <div class="flex justify-between items-center px-8 py-4">
+                    <h2 class="text-2xl font-semibold text-gray-800" id="pageTitle">Dashboard</h2>
+                    <div class="flex items-center space-x-4">
+                        <div class="relative">
+                            <input 
+                                type="text" 
+                                placeholder="Quick search..." 
+                                class="pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            />
+                            <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                        </div>
+                        <button class="p-2 rounded-full bg-gray-100 text-gray-600 relative">
+                            <i class="fas fa-bell"></i>
+                            <span class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center">3</span>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <div class="content-area p-8">
+                <!-- Dashboard Section -->
+                <section id="dashboard" class="section active">
+                    <!-- Dashboard content will be loaded here -->
+                </section>
+
+                <!-- Data Workspace Section -->
+                <section id="data" class="section">
+                    <!-- Data workspace content will be loaded here -->
+                </section>
+
+                <!-- File Manager Section -->
+                <section id="files" class="section">
+                    <!-- File manager content will be loaded here -->
+                </section>
+
+                <!-- Research Journal Section -->
+                <section id="notes" class="section">
+                    <!-- Research journal content will be loaded here -->
+                </section>
+
+                <!-- Task Manager Section -->
+                <section id="tasks" class="section">
+                    <!-- Task manager content will be loaded here -->
+                </section>
+
+                <!-- Research Search Section -->
+                <section id="search" class="section">
+                    <!-- Research search content will be loaded here -->
+                </section>
+
+                <!-- Collaboration Section -->
+                <section id="collab" class="section">
+                    <!-- Collaboration content will be loaded here -->
+                </section>
+
+                <!-- Settings Section -->
+                <section id="settings" class="section">
+                    <!-- Settings content will be loaded here -->
+                </section>
+            </div>
+
+            <!-- Footer -->
+            <footer class="bg-gray-100 border-t py-6 px-8">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div class="text-sm text-gray-600 mb-4 md:mb-0">
+                        &copy; 2023 ResearchFlow. Powered by <span class="font-semibold">NovisTech</span>. All rights reserved.
+                    </div>
+                    <div class="flex items-center space-x-6">
+                        <div class="flex items-center text-sm text-gray-600">
+                            <i class="fas fa-phone-alt mr-2"></i>
+                            <span>0628245294</span>
+                        </div>
+                        <div class="flex items-center text-sm text-gray-600">
+                            <i class="fas fa-envelope mr-2"></i>
+                            <span>devsolutions@novistech.com</span>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div class="modal" id="profileModal">
+        <div class="modal-content">
+            <div class="px-6 py-4 border-b flex justify-between items-center">
+                <h3 class="text-lg font-medium text-gray-800">Edit Profile</h3>
+                <button class="text-gray-500 hover:text-gray-700" id="closeProfileModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                    <input type="text" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" value="Dr. Jane Doe">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <input type="email" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" value="j.doe@university.edu">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                    <input type="text" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" value="Senior Researcher">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Institution</label>
+                    <input type="text" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" value="University of Technology">
+                </div>
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Bio</label>
+                    <textarea class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" rows="4">Research focused on data science and machine learning applications in healthcare.</textarea>
+                </div>
+                <div class="flex justify-end">
+                    <button class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg mr-2 hover:bg-gray-300">Cancel</button>
+                    <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Research Model Modal -->
+    <div class="modal" id="researchModelModal">
+        <div class="modal-content">
+            <div class="px-6 py-4 border-b flex justify-between items-center">
+                <h3 class="text-lg font-medium text-gray-800">Configure Research Model</h3>
+                <button class="text-gray-500 hover:text-gray-700" id="closeResearchModelModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Model Type</label>
+                    <select class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option>Linear Regression</option>
+                        <option>Logistic Regression</option>
+                        <option>Random Forest</option>
+                        <option>Neural Network</option>
+                        <option>Support Vector Machine</option>
+                    </select>
+                </div>
+                
+                <div id="parameterContainer">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Learning Rate</label>
+                        <input type="number" step="0.001" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" value="0.01">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Epochs</label>
+                        <input type="number" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" value="100">
+                    </div>
+                </div>
+                
+                <button id="addParameterBtn" class="mb-6 flex items-center text-blue-600 hover:text-blue-800">
+                    <i class="fas fa-plus-circle mr-2"></i> Add Parameter
+                </button>
+                
+                <div class="flex justify-end">
+                    <button class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg mr-2 hover:bg-gray-300">Cancel</button>
+                    <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Save & Run Analysis</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript for frontend functionality -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Toggle sidebar collapse
+            const toggleSidebar = document.getElementById('toggleSidebar');
+            const sidebar = document.querySelector('.sidebar');
+            const mainContent = document.querySelector('.main-content');
+            
+            toggleSidebar.addEventListener('click', function() {
+                sidebar.classList.toggle('collapsed');
+                mainContent.classList.toggle('expanded');
+            });
+            
+            // Navigation handling
+            const navItems = document.querySelectorAll('.nav-item');
+            const sections = document.querySelectorAll('.section');
+            const pageTitle = document.getElementById('pageTitle');
+            
+            navItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Remove active class from all items
+                    navItems.forEach(navItem => navItem.classList.remove('active'));
+                    sections.forEach(section => section.classList.remove('active'));
+                    
+                    // Add active class to clicked item
+                    this.classList.add('active');
+                    
+                    // Show corresponding section
+                    const targetId = this.getAttribute('href').substring(1);
+                    const targetSection = document.getElementById(targetId);
+                    targetSection.classList.add('active');
+                    
+                    // Update page title
+                    pageTitle.textContent = this.querySelector('.nav-label').textContent;
+                    
+                    // Load content via AJAX (to be replaced with Django template rendering)
+                    loadSectionContent(targetId);
+                });
+            });
+            
+            // Profile modal handling
+            const profileButton = document.getElementById('profileButton');
+            const profileModal = document.getElementById('profileModal');
+            const closeProfileModal = document.getElementById('closeProfileModal');
+            
+            profileButton.addEventListener('click', function() {
+                profileModal.classList.add('active');
+            });
+            
+            closeProfileModal.addEventListener('click', function() {
+                profileModal.classList.remove('active');
+            });
+            
+            // Research model modal handling
+            const researchModelModal = document.getElementById('researchModelModal');
+            const closeResearchModelModal = document.getElementById('closeResearchModelModal');
+            
+            closeResearchModelModal.addEventListener('click', function() {
+                researchModelModal.classList.remove('active');
+            });
+            
+            // Add parameter button
+            const addParameterBtn = document.getElementById('addParameterBtn');
+            const parameterContainer = document.getElementById('parameterContainer');
+            let paramCount = 2;
+            
+            addParameterBtn.addEventListener('click', function() {
+                paramCount++;
+                const newParam = document.createElement('div');
+                newParam.className = 'mb-4';
+                newParam.innerHTML = `
+                    <div class="flex items-center">
+                        <input type="text" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mr-2" placeholder="Parameter name">
+                        <input type="text" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Value">
+                        <button class="ml-2 text-red-500 hover:text-red-700 remove-param">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `;
+                parameterContainer.appendChild(newParam);
+                
+                // Add event listener to remove button
+                newParam.querySelector('.remove-param').addEventListener('click', function() {
+                    parameterContainer.removeChild(newParam);
+                });
+            });
+            
+            // Function to load section content
+            function loadSectionContent(sectionId) {
+                const section = document.getElementById(sectionId);
+                const contentArea = section.querySelector('.content');
+                
+                // Clear previous content
+                section.innerHTML = `
+                    <div class="loader absolute inset-0 bg-white bg-opacity-80 flex items-center justify-center z-10">
+                        <div class="text-center">
+                            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+                            <p class="mt-4 text-gray-600">Loading ${sectionId}...</p>
+                        </div>
+                    </div>
+                    <div class="content"></div>
+                `;
+                
+                const loader = section.querySelector('.loader');
+                const content = section.querySelector('.content');
+                
+                // Show loading state
+                section.classList.add('loading');
+                
+                // Simulate API call delay
+                setTimeout(() => {
+                    // Remove loading state
+                    section.classList.remove('loading');
+                    
+                    // Load appropriate content based on section
+                    switch(sectionId) {
+                        case 'dashboard':
+                            loadDashboardContent(content);
+                            break;
+                        case 'data':
+                            loadDataWorkspaceContent(content);
+                            break;
+                        case 'files':
+                            loadFileManagerContent(content);
+                            break;
+                        case 'notes':
+                            loadResearchJournalContent(content);
+                            break;
+                        case 'tasks':
+                            loadTaskManagerContent(content);
+                            break;
+                        case 'search':
+                            loadResearchSearchContent(content);
+                            break;
+                        case 'collab':
+                            loadCollaborationContent(content);
+                            break;
+                        case 'settings':
+                            loadSettingsContent(content);
+                            break;
+                    }
+                }, 800);
+            }
+            
+            // Content loading functions
+            function loadDashboardContent(container) {
+                container.innerHTML = `
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <div class="flex items-center">
+                                <div class="p-3 rounded-lg bg-blue-100 text-blue-600">
+                                    <i class="fas fa-file-alt text-xl"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <h3 class="text-sm font-medium text-gray-500">Research Files</h3>
+                                    <p class="text-2xl font-bold">12</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <div class="flex items-center">
+                                <div class="p-3 rounded-lg bg-green-100 text-green-600">
+                                    <i class="fas fa-tasks text-xl"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <h3 class="text-sm font-medium text-gray-500">Pending Tasks</h3>
+                                    <p class="text-2xl font-bold">5</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <div class="flex items-center">
+                                <div class="p-3 rounded-lg bg-purple-100 text-purple-600">
+                                    <i class="fas fa-sticky-note text-xl"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <h3 class="text-sm font-medium text-gray-500">Research Notes</h3>
+                                    <p class="text-2xl font-bold">8</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <div class="flex items-center">
+                                <div class="p-3 rounded-lg bg-yellow-100 text-yellow-600">
+                                    <i class="fas fa-database text-xl"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <h3 class="text-sm font-medium text-gray-500">Data Points</h3>
+                                    <p class="text-2xl font-bold">1,247</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                        <div class="bg-white rounded-lg shadow overflow-hidden">
+                            <div class="px-6 py-4 border-b flex justify-between items-center">
+                                <h3 class="text-lg font-medium text-gray-800">Research Progress</h3>
+                                <div class="flex space-x-2">
+                                    <button class="px-3 py-1 bg-blue-100 text-blue-700 rounded-lg text-xs font-medium hover:bg-blue-200 export-btn" data-format="csv">
+                                        <i class="fas fa-download mr-1"></i>CSV
+                                    </button>
+                                    <button class="px-3 py-1 bg-blue-100 text-blue-700 rounded-lg text-xs font-medium hover:bg-blue-200 export-btn" data-format="pdf">
+                                        <i class="fas fa-download mr-1"></i>PDF
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="p-6">
+                                <div class="chart-container">
+                                    <canvas id="progressChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-lg shadow overflow-hidden">
+                            <div class="px-6 py-4 border-b">
+                                <h3 class="text-lg font-medium text-gray-800">Recent Activities</h3>
+                            </div>
+                            <div class="p-6">
+                                <div class="border-b pb-4 mb-4">
+                                    <div class="flex justify-between">
+                                        <h4 class="font-medium">Data analysis completed</h4>
+                                        <span class="text-sm text-gray-500">2 hours ago</span>
+                                    </div>
+                                    <p class="text-sm text-gray-600 mt-1">Completed analysis for patient response study</p>
+                                </div>
+                                <div class="border-b pb-4 mb-4">
+                                    <div class="flex justify-between">
+                                        <h4 class="font-medium">New note added</h4>
+                                        <span class="text-sm text-gray-500">Yesterday</span>
+                                    </div>
+                                    <p class="text-sm text-gray-600 mt-1">Added literature review findings to research journal</p>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between">
+                                        <h4 class="font-medium">Collaborator added</h4>
+                                        <span class="text-sm text-gray-500">2 days ago</span>
+                                    </div>
+                                    <p class="text-sm text-gray-600 mt-1">Dr. Smith joined the research team</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div class="bg-white rounded-lg shadow overflow-hidden">
+                            <div class="px-6 py-4 border-b flex justify-between items-center">
+                                <h3 class="text-lg font-medium text-gray-800">Recent Notes</h3>
+                                <button class="text-blue-600 hover:text-blue-800">
+                                    <i class="fas fa-plus mr-1"></i> New Note
+                                </button>
+                            </div>
+                            <div class="p-6">
+                                <div class="border-b pb-4 mb-4">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <h4 class="font-medium">Literature Review Findings</h4>
+                                            <p class="text-sm text-gray-600 mt-1">Summary of recent publications on machine learning in healthcare...</p>
+                                        </div>
+                                        <span class="badge badge-public">Public</span>
+                                    </div>
+                                    <div class="flex items-center mt-2 text-sm text-gray-500">
+                                        <span>Updated 2 hours ago</span>
+                                        <span class="mx-2">•</span>
+                                        <div class="rating-stars">
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star-half-alt"></i>
+                                        </div>
+                                        <span class="ml-1">(4.5)</span>
+                                    </div>
+                                </div>
+                                <div class="border-b pb-4 mb-4">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <h4 class="font-medium">Methodology Considerations</h4>
+                                            <p class="text-sm text-gray-600 mt-1">Notes on methodological approaches for the current study...</p>
+                                        </div>
+                                        <span class="badge badge-private">Private</span>
+                                    </div>
+                                    <div class="flex items-center mt-2 text-sm text-gray-500">
+                                        <span>Updated yesterday</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <h4 class="font-medium">Conference Notes - ICRA 2023</h4>
+                                            <p class="text-sm text-gray-600 mt-1">Key takeaways from the International Conference on Research Advances...</p>
+                                        </div>
+                                        <span class="badge badge-public">Public</span>
+                                    </div>
+                                    <div class="flex items-center mt-2 text-sm text-gray-500">
+                                        <span>Updated 3 days ago</span>
+                                        <span class="mx-2">•</span>
+                                        <div class="rating-stars">
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="far fa-star"></i>
+                                        </div>
+                                        <span class="ml-1">(4.0)</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-lg shadow overflow-hidden">
+                            <div class="px-6 py-4 border-b flex justify-between items-center">
+                                <h3 class="text-lg font-medium text-gray-800">Upcoming Tasks</h3>
+                                <button class="text-blue-600 hover:text-blue-800">
+                                    <i class="fas fa-plus mr-1"></i> New Task
+                                </button>
+                            </div>
+                            <div class="p-6">
+                                <div class="flex items-center justify-between border-b pb-4 mb-4">
+                                    <div>
+                                        <h4 class="font-medium">Complete data analysis</h4>
+                                        <p class="text-sm text-gray-600">Patient response study dataset</p>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <span class="badge badge-inprogress mr-2">In Progress</span>
+                                        <span class="text-sm text-gray-500">Due tomorrow</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between border-b pb-4 mb-4">
+                                    <div>
+                                        <h4 class="font-medium">Prepare research paper draft</h4>
+                                        <p class="text-sm text-gray-600">Journal of Medical Research</p>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <span class="badge badge-pending mr-2">Pending</span>
+                                        <span class="text-sm text-gray-500">Due in 3 days</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <h4 class="font-medium">Review collaborator feedback</h4>
+                                        <p class="text-sm text-gray-600">Methodology section</p>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <span class="badge badge-pending mr-2">Pending</span>
+                                        <span class="text-sm text-gray-500">Due in 5 days</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Initialize chart
+                setTimeout(() => {
+                    const ctx = document.getElementById('progressChart').getContext('2d');
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                            datasets: [{
+                                label: 'Research Progress',
+                                data: [30, 45, 60, 75, 85, 95],
+                                backgroundColor: '#3b82f6',
+                                borderColor: '#2563eb',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    max: 100,
+                                    ticks: {
+                                        callback: function(value) {
+                                            return value + '%';
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }, 100);
+                
+                // Add export functionality
+                const exportButtons = container.querySelectorAll('.export-btn');
+                exportButtons.forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const format = this.getAttribute('data-format');
+                        alert(`Exporting dashboard data as ${format.toUpperCase()}. This would connect to Django backend.`);
+                    });
+                });
+            }
+            
+            function loadDataWorkspaceContent(container) {
+                container.innerHTML = `
+                    <div class="bg-white rounded-lg shadow mb-6">
+                        <div class="px-6 py-4 border-b flex justify-between items-center">
+                            <h3 class="text-lg font-medium text-gray-800">Data Analysis Workspace</h3>
+                            <div class="flex space-x-2">
+                                <button class="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg text-sm font-medium hover:bg-blue-200">
+                                    <i class="fas fa-plus mr-2"></i>Add Column
+                                </button>
+                                <button class="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg text-sm font-medium hover:bg-blue-200">
+                                    <i class="fas fa-plus mr-2"></i>Add Row
+                                </button>
+                                <button class="px-4 py-2 bg-green-100 text-green-700 rounded-lg text-sm font-medium hover:bg-green-200" id="analyzeDataBtn">
+                                    <i class="fas fa-calculator mr-2"></i>Analyze Data
+                                </button>
+                                <div class="relative">
+                                    <button class="px-4 py-2 bg-purple-100 text-purple-700 rounded-lg text-sm font-medium hover:bg-purple-200" id="importExcelBtn">
+                                        <i class="fas fa-file-import mr-2"></i>Import Excel
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-6 overflow-auto">
+                            <div class="text-center py-10 text-gray-500">
+                                <i class="fas fa-table fa-3x mb-4"></i>
+                                <p>No data loaded. Import data to begin analysis.</p>
+                                <button class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                                    <i class="fas fa-file-import mr-2"></i>Import Dataset
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow">
+                        <div class="px-6 py-4 border-b">
+                            <h3 class="text-lg font-medium text-gray-800">Quick Analysis Tools</h3>
+                        </div>
+                        <div class="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <button class="p-4 bg-blue-50 rounded-lg text-center hover:bg-blue-100">
+                                <i class="fas fa-chart-bar text-blue-600 text-2xl mb-2"></i>
+                                <h4 class="font-medium">Descriptive Stats</h4>
+                                <p class="text-sm text-gray-600">Mean, median, mode, etc.</p>
+                            </button>
+                            <button class="p-4 bg-green-50 rounded-lg text-center hover:bg-green-100">
+                                <i class="fas fa-project-diagram text-green-600 text-2xl mb-2"></i>
+                                <h4 class="font-medium">Correlation</h4>
+                                <p class="text-sm text-gray-600">Find relationships between variables</p>
+                            </button>
+                            <button class="p-4 bg-purple-50 rounded-lg text-center hover:bg-purple-100">
+                                <i class="fas fa-chart-line text-purple-600 text-2xl mb-2"></i>
+                                <h4 class="font-medium">Regression</h4>
+                                <p class="text-sm text-gray-600">Predictive modeling</p>
+                            </button>
+                            <button class="p-4 bg-yellow-50 rounded-lg text-center hover:bg-yellow-100">
+                                <i class="fas fa-balance-scale text-yellow-600 text-2xl mb-2"></i>
+                                <h4 class="font-medium">T-Test</h4>
+                                <p class="text-sm text-gray-600">Compare means between groups</p>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                // Add event listeners
+                const analyzeDataBtn = container.querySelector('#analyzeDataBtn');
+                const importExcelBtn = container.querySelector('#importExcelBtn');
+                
+                analyzeDataBtn.addEventListener('click', function() {
+                    researchModelModal.classList.add('active');
+                });
+                
+                importExcelBtn.addEventListener('click', function() {
+                    alert("Excel import functionality would connect to Django backend for file processing.");
+                });
+            }
+            
+            function loadFileManagerContent(container) {
+                container.innerHTML = `
+                    <div class="bg-white rounded-lg shadow mb-6">
+                        <div class="px-6 py-4 border-b flex justify-between items-center">
+                            <h3 class="text-lg font-medium text-gray-800">Research Files</h3>
+                            <button class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700">
+                                <i class="fas fa-upload mr-2"></i>Upload Files
+                            </button>
+                        </div>
+                        <div class="p-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                <div class="file-card bg-gray-50 rounded-lg p-4 border">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600">
+                                            <i class="fas fa-file-excel"></i>
+                                        </div>
+                                        <div class="flex space-x-1">
+                                            <button class="p-1 text-gray-500 hover:text-blue-600">
+                                                <i class="fas fa-download"></i>
+                                            </button>
+                                            <button class="p-1 text-gray-500 hover:text-green-600">
+                                                <i class="fas fa-share-alt"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <h4 class="font-medium truncate">patient_data.xlsx</h4>
+                                    <p class="text-sm text-gray-600">Uploaded 2 days ago</p>
+                                    <div class="flex items-center justify-between mt-2">
+                                        <span class="badge badge-public">Public</span>
+                                        <span class="text-xs text-gray-500">2.4 MB</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="file-card bg-gray-50 rounded-lg p-4 border">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center text-red-600">
+                                            <i class="fas fa-file-pdf"></i>
+                                        </div>
+                                        <div class="flex space-x-1">
+                                            <button class="p-1 text-gray-500 hover:text-blue-600">
+                                                <i class="fas fa-download"></i>
+                                            </button>
+                                            <button class="p-1 text-gray-500 hover:text-green-600">
+                                                <i class="fas fa-share-alt"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <h4 class="font-medium truncate">research_paper.pdf</h4>
+                                    <p class="text-sm text-gray-600">Uploaded 1 week ago</p>
+                                    <div class="flex items-center justify-between mt-2">
+                                        <span class="badge badge-private">Private</span>
+                                        <span class="text-xs text-gray-500">5.1 MB</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="file-card bg-gray-50 rounded-lg p-4 border">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center text-green-600">
+                                            <i class="fas fa-file-word"></i>
+                                        </div>
+                                        <div class="flex space-x-1">
+                                            <button class="p-1 text-gray-500 hover:text-blue-600">
+                                                <i class="fas fa-download"></i>
+                                            </button>
+                                            <button class="p-1 text-gray-500 hover:text-green-600">
+                                                <i class="fas fa-share-alt"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <h4 class="font-medium truncate">methodology.docx</h4>
+                                    <p class="text-sm text-gray-600">Uploaded 3 days ago</p>
+                                    <div class="flex items-center justify-between mt-2">
+                                        <span class="badge badge-public">Public</span>
+                                        <span class="text-xs text-gray-500">1.2 MB</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow">
+                        <div class="px-6 py-4 border-b">
+                            <h3 class="text-lg font-medium text-gray-800">File Activity</h3>
+                        </div>
+                        <div class="p-6">
+                            <div class="border-b pb-4 mb-4">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <h4 class="font-medium">patient_data.xlsx</h4>
+                                        <p class="text-sm text-gray-600">Uploaded by you</p>
+                                    </div>
+                                    <span class="text-sm text-gray-500">2 days ago</span>
+                                </div>
+                            </div>
+                            <div class="border-b pb-4 mb-4">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <h4 class="font-medium">research_paper.pdf</h4>
+                                        <p class="text-sm text-gray-600">Uploaded by Dr. Smith</p>
+                                    </div>
+                                    <span class="text-sm text-gray-500">1 week ago</span>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <h4 class="font-medium">methodology.docx</h4>
+                                        <p class="text-sm text-gray-600">Uploaded by you</p>
+                                    </div>
+                                    <span class="text-sm text-gray-500">3 days ago</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            function loadResearchJournalContent(container) {
+                container.innerHTML = `
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div class="lg:col-span-2">
+                            <div class="bg-white rounded-lg shadow mb-6">
+                                <div class="px-6 py-4 border-b flex justify-between items-center">
+                                    <h3 class="text-lg font-medium text-gray-800">Research Notes</h3>
+                                    <button class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700">
+                                        <i class="fas fa-plus mr-2"></i>New Note
+                                    </button>
+                                </div>
+                                <div class="p-6">
+                                    <div class="note-card border rounded-lg p-4 mb-4">
+                                        <div class="flex justify-between items-start mb-2">
+                                            <h4 class="font-medium text-lg">Literature Review Findings</h4>
+                                            <div class="flex space-x-2">
+                                                <span class="badge badge-public">Public</span>
+                                                <div class="rating-stars">
+                                                    <i class="fas fa-star"></i>
+                                                    <i class="fas fa-star"></i>
+                                                    <i class="fas fa-star"></i>
+                                                    <i class="fas fa-star"></i>
+                                                    <i class="fas fa-star-half-alt"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <p class="text-gray-600 mb-4">Summary of recent publications on machine learning applications in healthcare diagnostics. Several studies show promising results with convolutional neural networks for medical image analysis.</p>
+                                        <div class="flex justify-between items-center">
+                                            <span class="text-sm text-gray-500">Last updated: 2 hours ago</span>
+                                            <div class="flex space-x-2">
+                                                <button class="text-blue-600 hover:text-blue-800">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="text-green-600 hover:text-green-800">
+                                                    <i class="fas fa-share-alt"></i>
+                                                </button>
+                                                <button class="text-red-600 hover:text-red-800">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="note-card border rounded-lg p-4 mb-4">
+                                        <div class="flex justify-between items-start mb-2">
+                                            <h4 class="font-medium text-lg">Methodology Considerations</h4>
+                                            <span class="badge badge-private">Private</span>
+                                        </div>
+                                        <p class="text-gray-600 mb-4">Considering using a mixed-methods approach for the current study. Quantitative analysis will be supplemented with qualitative interviews to provide deeper insights into patient experiences.</p>
+                                        <div class="flex justify-between items-center">
+                                            <span class="text-sm text-gray-500">Last updated: Yesterday</span>
+                                            <div class="flex space-x-2">
+                                                <button class="text-blue-600 hover:text-blue-800">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="text-green-600 hover:text-green-800">
+                                                    <i class="fas fa-share-alt"></i>
+                                                </button>
+                                                <button class="text-red-600 hover:text-red-800">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="note-card border rounded-lg p-4">
+                                        <div class="flex justify-between items-start mb-2">
+                                            <h4 class="font-medium text-lg">Conference Notes - ICRA 2023</h4>
+                                            <div class="flex space-x-2">
+                                                <span class="badge badge-public">Public</span>
+                                                <div class="rating-stars">
+                                                    <i class="fas fa-star"></i>
+                                                    <i class="fas fa-star"></i>
+                                                    <i class="fas fa-star"></i>
+                                                    <i class="fas fa-star"></i>
+                                                    <i class="far fa-star"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <p class="text-gray-600 mb-4">Key takeaways from the International Conference on Research Advances. Notable presentation on ethical considerations in AI research by Dr. Johnson from Stanford.</p>
+                                        <div class="flex justify-between items-center">
+                                            <span class="text-sm text-gray-500">Last updated: 3 days ago</span>
+                                            <div class="flex space-x-2">
+                                                <button class="text-blue-600 hover:text-blue-800">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="text-green-600 hover:text-green-800">
+                                                    <i class="fas fa-share-alt"></i>
+                                                </button>
+                                                <button class="text-red-600 hover:text-red-800">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="bg-white rounded-lg shadow sticky top-6">
+                                <div class="px-6 py-4 border-b">
+                                    <h3 class="text-lg font-medium text-gray-800">Add New Note</h3>
+                                </div>
+                                <div class="p-6">
+                                    <div class="mb-4">
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                                        <input 
+                                            type="text" 
+                                            class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            placeholder="Note title"
+                                        />
+                                    </div>
+                                    <div class="mb-4">
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Content</label>
+                                        <textarea 
+                                            rows="5"
+                                            class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            placeholder="Write your research notes here..."
+                                        ></textarea>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Visibility</label>
+                                        <select class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                            <option value="private">Private</option>
+                                            <option value="public">Public</option>
+                                        </select>
+                                    </div>
+                                    <button class="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                                        Save Note
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            function loadTaskManagerContent(container) {
+                container.innerHTML = `
+                    <div class="bg-white rounded-lg shadow mb-6">
+                        <div class="px-6 py-4 border-b">
+                            <h3 class="text-lg font-medium text-gray-800">Research Tasks</h3>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex mb-6">
+                                <input 
+                                    type="text" 
+                                    class="flex-1 px-4 py-2 border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="Add a new research task..."
+                                />
+                                <button class="px-6 bg-blue-600 text-white rounded-r-lg hover:bg-blue-700">
+                                    Add
+                                </button>
+                            </div>
+
+                            <div class="space-y-3" id="tasksContainer">
+                                <div class="flex items-center justify-between p-3 border rounded-lg">
+                                    <div class="flex items-center">
+                                        <input type="checkbox" class="mr-3 h-5 w-5 text-blue-600">
+                                        <div>
+                                            <h4 class="font-medium">Complete data analysis</h4>
+                                            <p class="text-sm text-gray-600">Patient response study dataset</p>
+                                        </div>
+                                    </div>
+                                    <span class="badge badge-inprogress">In Progress</span>
+                                </div>
+                                
+                                <div class="flex items-center justify-between p-3 border rounded-lg">
+                                    <div class="flex items-center">
+                                        <input type="checkbox" class="mr-3 h-5 w-5 text-blue-600">
+                                        <div>
+                                            <h4 class="font-medium">Prepare research paper draft</h4>
+                                            <p class="text-sm text-gray-600">Journal of Medical Research</p>
+                                        </div>
+                                    </div>
+                                    <span class="badge badge-pending">Pending</span>
+                                </div>
+                                
+                                <div class="flex items-center justify-between p-3 border rounded-lg">
+                                    <div class="flex items-center">
+                                        <input type="checkbox" class="mr-3 h-5 w-5 text-blue-600" checked>
+                                        <div>
+                                            <h4 class="font-medium task-completed">Literature review</h4>
+                                            <p class="text-sm text-gray-600">Recent publications on ML in healthcare</p>
+                                        </div>
+                                    </div>
+                                    <span class="badge badge-completed">Completed</span>
+                                </div>
+                                
+                                <div class="flex items-center justify-between p-3 border rounded-lg">
+                                    <div class="flex items-center">
+                                        <input type="checkbox" class="mr-3 h-5 w-5 text-blue-600">
+                                        <div>
+                                            <h4 class="font-medium">Review collaborator feedback</h4>
+                                            <p class="text-sm text-gray-600">Methodology section</p>
+                                        </div>
+                                    </div>
+                                    <span class="badge badge-pending">Pending</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow">
+                        <div class="px-6 py-4 border-b">
+                            <h3 class="text-lg font-medium text-gray-800">Task Statistics</h3>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex items-center justify-between mb-6">
+                                <div>
+                                    <h4 class="text-sm font-medium text-gray-600">Total Tasks</h4>
+                                    <p class="text-2xl font-bold">4</p>
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-medium text-gray-600">Completed</h4>
+                                    <p class="text-2xl font-bold text-green-600">1</p>
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-medium text-gray-600">Pending</h4>
+                                    <p class="text-2xl font-bold text-yellow-600">2</p>
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-medium text-gray-600">In Progress</h4>
+                                    <p class="text-2xl font-bold text-blue-600">1</p>
+                                </div>
+                            </div>
+
+                            <div class="w-full bg-gray-200 rounded-full h-2.5 mb-2">
+                                <div class="bg-blue-600 h-2.5 rounded-full" style="width: 25%"></div>
+                            </div>
+                            <p class="text-sm text-gray-600">25% of tasks completed</p>
+                        </div>
+                    </div>
+                `;
+                
+                // Add task completion functionality
+                const checkboxes = container.querySelectorAll('input[type="checkbox"]');
+                checkboxes.forEach(checkbox => {
+                    checkbox.addEventListener('change', function() {
+                        const taskText = this.parentElement.querySelector('.font-medium');
+                        if (this.checked) {
+                            taskText.classList.add('task-completed');
+                        } else {
+                            taskText.classList.remove('task-completed');
+                        }
+                    });
+                });
+            }
+            
+            function loadResearchSearchContent(container) {
+                container.innerHTML = `
+                    <div class="bg-white rounded-lg shadow mb-6">
+                        <div class="px-6 py-4 border-b">
+                            <h3 class="text-lg font-medium text-gray-800">Research Database Search</h3>
+                        </div>
+                        <div class="p-6">
+                            <div class="mb-6">
+                                <div class="relative">
+                                    <input 
+                                        type="text" 
+                                        placeholder="Search research papers, datasets, and publications..." 
+                                        class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    />
+                                    <i class="fas fa-search absolute left-3 top-3.5 text-gray-400"></i>
+                                </div>
+                            </div>
+                            
+                            <div class="flex flex-wrap gap-2 mb-6">
+                                <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">Machine Learning</span>
+                                <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">Healthcare</span>
+                                <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">Data Analysis</span>
+                                <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">Neural Networks</span>
+                                <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">Clinical Trials</span>
+                            </div>
+                            
+                            <div class="space-y-4">
+                                <div class="search-result border rounded-lg p-4">
+                                    <div class="flex justify-between items-start">
+                                        <h4 class="font-medium text-lg text-blue-600">Machine Learning Approaches to Medical Diagnosis</h4>
+                                        <span class="badge badge-public">Public</span>
+                                    </div>
+                                    <p class="text-sm text-gray-600 mb-2">Johnson, A., Smith, B., & Williams, C. (2023). Journal of Medical AI.</p>
+                                    <p class="text-gray-700 mb-3">This study explores various machine learning techniques for improving diagnostic accuracy in medical imaging, with a focus on convolutional neural networks and their applications.</p>
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center">
+                                            <div class="rating-stars mr-2">
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star-half-alt"></i>
+                                            </div>
+                                            <span class="text-sm text-gray-600">4.5 (12 reviews)</span>
+                                        </div>
+                                        <div class="flex space-x-2">
+                                            <button class="text-blue-600 hover:text-blue-800">
+                                                <i class="fas fa-download"></i>
+                                            </button>
+                                            <button class="text-green-600 hover:text-green-800">
+                                                <i class="fas fa-share-alt"></i>
+                                            </button>
+                                            <button class="text-purple-600 hover:text-purple-800">
+                                                <i class="fas fa-bookmark"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="search-result border rounded-lg p-4">
+                                    <div class="flex justify-between items-start">
+                                        <h4 class="font-medium text-lg text-blue-600">Ethical Considerations in AI Healthcare Research</h4>
+                                        <span class="badge badge-public">Public</span>
+                                    </div>
+                                    <p class="text-sm text-gray-600 mb-2">Brown, D., & Miller, E. (2022). Ethics in Technology Journal.</p>
+                                    <p class="text-gray-700 mb-3">This paper addresses the ethical challenges and considerations when implementing AI systems in healthcare settings, focusing on patient privacy, bias mitigation, and transparency.</p>
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center">
+                                            <div class="rating-stars mr-2">
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="far fa-star"></i>
+                                            </div>
+                                            <span class="text-sm text-gray-600">4.0 (8 reviews)</span>
+                                        </div>
+                                        <div class="flex space-x-2">
+                                            <button class="text-blue-600 hover:text-blue-800">
+                                                <i class="fas fa-download"></i>
+                                            </button>
+                                            <button class="text-green-600 hover:text-green-800">
+                                                <i class="fas fa-share-alt"></i>
+                                            </button>
+                                            <button class="text-purple-600 hover:text-purple-800">
+                                                <i class="fas fa-bookmark"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="search-result border rounded-lg p-4">
+                                    <div class="flex justify-between items-start">
+                                        <h4 class="font-medium text-lg text-blue-600">Advanced Neural Networks for Medical Image Analysis</h4>
+                                        <span class="badge badge-private">Private</span>
+                                    </div>
+                                    <p class="text-sm text-gray-600 mb-2">Wilson, F., & Davis, G. (2023). Conference on Medical Imaging.</p>
+                                    <p class="text-gray-700 mb-3">A technical paper exploring the use of advanced neural network architectures for improving the accuracy of medical image analysis, with comparative results across multiple datasets.</p>
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center">
+                                            <div class="rating-stars mr-2">
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                            </div>
+                                            <span class="text-sm text-gray-600">4.8 (5 reviews)</span>
+                                        </div>
+                                        <div class="flex space-x-2">
+                                            <button class="text-blue-600 hover:text-blue-800">
+                                                <i class="fas fa-download"></i>
+                                            </button>
+                                            <button class="text-green-600 hover:text-green-800">
+                                                <i class="fas fa-share-alt"></i>
+                                            </button>
+                                            <button class="text-purple-600 hover:text-purple-800">
+                                                <i class="fas fa-bookmark"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            function loadCollaborationContent(container) {
+                container.innerHTML = `
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div class="lg:col-span-2">
+                            <div class="bg-white rounded-lg shadow mb-6">
+                                <div class="px-6 py-4 border-b flex justify-between items-center">
+                                    <h3 class="text-lg font-medium text-gray-800">Research Team</h3>
+                                    <button class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700">
+                                        <i class="fas fa-plus mr-2"></i>Invite Member
+                                    </button>
+                                </div>
+                                <div class="p-6">
+                                    <div class="flex items-center justify-between border-b pb-4 mb-4">
+                                        <div class="flex items-center">
+                                            <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold mr-3">
+                                                JD
+                                            </div>
+                                            <div>
+                                                <h4 class="font-medium">Dr. Jane Doe</h4>
+                                                <p class="text-sm text-gray-600">Principal Investigator</p>
+                                            </div>
+                                        </div>
+                                        <span class="badge badge-inprogress">Owner</span>
+                                    </div>
+                                    
+                                    <div class="flex items-center justify-between border-b pb-4 mb-4">
+                                        <div class="flex items-center">
+                                            <div class="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center text-white font-bold mr-3">
+                                                BS
+                                            </div>
+                                            <div>
+                                                <h4 class="font-medium">Dr. Benjamin Smith</h4>
+                                                <p class="text-sm text-gray-600">Data Scientist</p>
+                                            </div>
+                                        </div>
+                                        <span class="badge badge-completed">Admin</span>
+                                    </div>
+                                    
+                                    <div class="flex items-center justify-between border-b pb-4 mb-4">
+                                        <div class="flex items-center">
+                                            <div class="w-10 h-10 rounded-full bg-purple-500 flex items-center justify-center text-white font-bold mr-3">
+                                                ER
+                                            </div>
+                                            <div>
+                                                <h4 class="font-medium">Emma Rodriguez</h4>
+                                                <p class="text-sm text-gray-600">Research Assistant</p>
+                                            </div>
+                                        </div>
+                                        <span class="badge badge-pending">Member</span>
+                                    </div>
+                                    
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center">
+                                            <div class="w-10 h-10 rounded-full bg-yellow-500 flex items-center justify-center text-white font-bold mr-3">
+                                                MK
+                                            </div>
+                                            <div>
+                                                <h4 class="font-medium">Dr. Michael Kim</h4>
+                                                <p class="text-sm text-gray-600">Medical Consultant</p>
+                                            </div>
+                                        </div>
+                                        <span class="badge badge-pending">Member</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-white rounded-lg shadow">
+                                <div class="px-6 py-4 border-b">
+                                    <h3 class="text-lg font-medium text-gray-800">Team Discussions</h3>
+                                </div>
+                                <div class="p-6">
+                                    <div class="border rounded-lg p-4 mb-4">
+                                        <div class="flex items-start justify-between mb-2">
+                                            <div class="flex items-center">
+                                                <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold text-xs mr-2">
+                                                    BS
+                                                </div>
+                                                <h4 class="font-medium">Dr. Benjamin Smith</h4>
+                                            </div>
+                                            <span class="text-sm text-gray-500">2 hours ago</span>
+                                        </div>
+                                        <p class="text-gray-700 mb-2">I've completed the initial analysis of the patient response data. The results look promising, but we might need a larger sample size for the next phase.</p>
+                                        <div class="flex items-center text-sm text-gray-500">
+                                            <button class="text-blue-600 hover:text-blue-800 mr-3">
+                                                <i class="far fa-thumbs-up mr-1"></i> Like
+                                            </button>
+                                            <button class="text-blue-600 hover:text-blue-800">
+                                                <i class="far fa-comment mr-1"></i> Reply
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="border rounded-lg p-4">
+                                        <div class="flex items-start justify-between mb-2">
+                                            <div class="flex items-center">
+                                                <div class="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center text-white font-bold text-xs mr-2">
+                                                    ER
+                                                </div>
+                                                <h4 class="font-medium">Emma Rodriguez</h4>
+                                            </div>
+                                            <span class="text-sm text-gray-500">Yesterday</span>
+                                        </div>
+                                        <p class="text-gray-700 mb-2">I've uploaded the latest literature review findings to the shared folder. There are several new studies from the ICRA conference that might be relevant to our work.</p>
+                                        <div class="flex items-center text-sm text-gray-500">
+                                            <button class="text-blue-600 hover:text-blue-800 mr-3">
+                                                <i class="far fa-thumbs-up mr-1"></i> Like
+                                            </button>
+                                            <button class="text-blue-600 hover:text-blue-800">
+                                                <i class="far fa-comment mr-1"></i> Reply
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mt-4">
+                                        <div class="flex">
+                                            <input 
+                                                type="text" 
+                                                class="flex-1 px-4 py-2 border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                placeholder="Add a comment..."
+                                            />
+                                            <button class="px-4 bg-blue-600 text-white rounded-r-lg hover:bg-blue-700">
+                                                Post
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="bg-white rounded-lg shadow sticky top-6">
+                                <div class="px-6 py-4 border-b">
+                                    <h3 class="text-lg font-medium text-gray-800">Shared Resources</h3>
+                                </div>
+                                <div class="p-6">
+                                    <div class="mb-4">
+                                        <h4 class="font-medium mb-2">Research Documents</h4>
+                                        <ul class="space-y-2">
+                                            <li class="flex items-center text-sm text-blue-600">
+                                                <i class="fas fa-file-pdf mr-2 text-red-500"></i>
+                                                <span>Research_Proposal.pdf</span>
+                                            </li>
+                                            <li class="flex items-center text-sm text-blue-600">
+                                                <i class="fas fa-file-excel mr-2 text-green-500"></i>
+                                                <span>Data_Analysis.xlsx</span>
+                                            </li>
+                                            <li class="flex items-center text-sm text-blue-600">
+                                                <i class="fas fa-file-word mr-2 text-blue-500"></i>
+                                                <span>Methodology.docx</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <h4 class="font-medium mb-2">Project Timeline</h4>
+                                        <div class="bg-gray-100 rounded-lg p-3">
+                                            <div class="flex justify-between items-center mb-1">
+                                                <span class="text-sm">Phase 1: Data Collection</span>
+                                                <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">Completed</span>
+                                            </div>
+                                            <div class="flex justify-between items-center mb-1">
+                                                <span class="text-sm">Phase 2: Analysis</span>
+                                                <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">In Progress</span>
+                                            </div>
+                                            <div class="flex justify-between items-center">
+                                                <span class="text-sm">Phase 3: Publication</span>
+                                                <span class="text-xs bg-gray-100 text-gray-800 px-2 py-1 rounded-full">Not Started</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div>
+                                        <h4 class="font-medium mb-2">Upcoming Meetings</h4>
+                                        <div class="border rounded-lg p-3">
+                                            <div class="flex items-center mb-2">
+                                                <div class="w-2 h-2 bg-blue-600 rounded-full mr-2"></div>
+                                                <span class="text-sm font-medium">Team Sync</span>
+                                                <span class="text-xs text-gray-500 ml-auto">Tomorrow, 10:00 AM</span>
+                                            </div>
+                                            <div class="flex items-center">
+                                                <div class="w-2 h-2 bg-green-600 rounded-full mr-2"></div>
+                                                <span class="text-sm font-medium">Client Review</span>
+                                                <span class="text-xs text-gray-500 ml-auto">Jun 15, 2:00 PM</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            function loadSettingsContent(container) {
+                container.innerHTML = `
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div class="lg:col-span-2">
+                            <div class="bg-white rounded-lg shadow mb-6">
+                                <div class="px-6 py-4 border-b">
+                                    <h3 class="text-lg font-medium text-gray-800">Account Settings</h3>
+                                </div>
+                                <div class="p-6">
+                                    <div class="mb-6">
+                                        <h4 class="font-medium mb-4">Profile Information</h4>
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div>
+                                                <label class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                                                <input type="text" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" value="Jane">
+                                            </div>
+                                            <div>
+                                                <label class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                                                <input type="text" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" value="Doe">
+                                            </div>
+                                            <div>
+                                                <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                                                <input type="email" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" value="j.doe@university.edu">
+                                            </div>
+                                            <div>
+                                                <label class="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                                                <input type="text" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" value="Senior Researcher">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-6">
+                                        <h4 class="font-medium mb-4">Security</h4>
+                                        <div class="grid grid-cols-1 gap-4">
+                                            <div>
+                                                <label class="block text-sm font-medium text-gray-700 mb-1">Current Password</label>
+                                                <input type="password" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                            </div>
+                                            <div>
+                                                <label class="block text-sm font-medium text-gray-700 mb-1">New Password</label>
+                                                <input type="password" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                            </div>
+                                            <div>
+                                                <label class="block text-sm font-medium text-gray-700 mb-1">Confirm New Password</label>
+                                                <input type="password" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex justify-end">
+                                        <button class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg mr-2 hover:bg-gray-300">Cancel</button>
+                                        <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Save Changes</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-white rounded-lg shadow">
+                                <div class="px-6 py-4 border-b">
+                                    <h3 class="text-lg font-medium text-gray-800">Research Projects</h3>
+                                </div>
+                                <div class="p-6">
+                                    <div class="flex justify-between items-center mb-6">
+                                        <h4 class="font-medium">Your Research Projects</h4>
+                                        <button class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700">
+                                            <i class="fas fa-plus mr-2"></i>New Project
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="space-y-4">
+                                        <div class="border rounded-lg p-4">
+                                            <div class="flex justify-between items-start mb-2">
+                                                <h4 class="font-medium">Machine Learning in Healthcare Diagnostics</h4>
+                                                <span class="badge badge-public">Public</span>
+                                            </div>
+                                            <p class="text-gray-600 mb-4">Exploring the application of machine learning algorithms for improving diagnostic accuracy in medical imaging.</p>
+                                            <div class="flex items-center justify-between">
+                                                <div class="flex items-center text-sm text-gray-500">
+                                                    <span>Last updated: 2 days ago</span>
+                                                    <span class="mx-2">•</span>
+                                                    <span>5 members</span>
+                                                </div>
+                                                <div class="flex space-x-2">
+                                                    <button class="text-blue-600 hover:text-blue-800">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <button class="text-green-600 hover:text-green-800">
+                                                        <i class="fas fa-share-alt"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="border rounded-lg p-4">
+                                            <div class="flex justify-between items-start mb-2">
+                                                <h4 class="font-medium">Ethical AI Research Framework</h4>
+                                                <span class="badge badge-private">Private</span>
+                                            </div>
+                                            <p class="text-gray-600 mb-4">Developing a comprehensive framework for ethical considerations in artificial intelligence research.</p>
+                                            <div class="flex items-center justify-between">
+                                                <div class="flex items-center text-sm text-gray-500">
+                                                    <span>Last updated: 1 week ago</span>
+                                                    <span class="mx-2">•</span>
+                                                    <span>3 members</span>
+                                                </div>
+                                                <div class="flex space-x-2">
+                                                    <button class="text-blue-600 hover:text-blue-800">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <button class="text-green-600 hover:text-green-800">
+                                                        <i class="fas fa-share-alt"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="bg-white rounded-lg shadow sticky top-6">
+                                <div class="px-6 py-4 border-b">
+                                    <h3 class="text-lg font-medium text-gray-800">Notification Settings</h3>
+                                </div>
+                                <div class="p-6">
+                                    <div class="mb-4">
+                                        <label class="flex items-center">
+                                            <input type="checkbox" class="rounded text-blue-600 focus:ring-blue-500" checked>
+                                            <span class="ml-2 text-sm text-gray-700">Email Notifications</span>
+                                        </label>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label class="flex items-center">
+                                            <input type="checkbox" class="rounded text-blue-600 focus:ring-blue-500" checked>
+                                            <span class="ml-2 text-sm text-gray-700">Task Reminders</span>
+                                        </label>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label class="flex items-center">
+                                            <input type="checkbox" class="rounded text-blue-600 focus:ring-blue-500">
+                                            <span class="ml-2 text-sm text-gray-700">Collaborator Requests</span>
+                                        </label>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label class="flex items-center">
+                                            <input type="checkbox" class="rounded text-blue-600 focus:ring-blue-500" checked>
+                                            <span class="ml-2 text-sm text-gray-700">Research Updates</span>
+                                        </label>
+                                    </div>
+                                    <div class="mb-6">
+                                        <label class="flex items-center">
+                                            <input type="checkbox" class="rounded text-blue-600 focus:ring-blue-500" checked>
+                                            <span class="ml-2 text-sm text-gray-700">Weekly Reports</span>
+                                        </label>
+                                    </div>
+                                    
+                                    <h4 class="font-medium mb-4">Privacy Settings</h4>
+                                    <div class="mb-4">
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Default Visibility</label>
+                                        <select class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                            <option value="private">Private</option>
+                                            <option value="public">Public</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label class="flex items-center">
+                                            <input type="checkbox" class="rounded text-blue-600 focus:ring-blue-500" checked>
+                                            <span class="ml-2 text-sm text-gray-700">Allow ratings on my research</span>
+                                        </label>
+                                    </div>
+                                    <div>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" class="rounded text-blue-600 focus:ring-blue-500">
+                                            <span class="ml-2 text-sm text-gray-700">Show my profile in search results</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Initialize the dashboard content
+            loadSectionContent('dashboard');
+        });
+    </script>
+</body>
+</html>

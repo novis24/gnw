@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maritime System - Academic Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #1a237e;
+            --secondary: #283593;
+            --accent: #3949ab;
+            --light: #e8eaf6;
+            --dark: #0d1238;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+        
+        .sidebar {
+            background-color: var(--primary);
+            color: white;
+            height: 100vh;
+            position: fixed;
+            padding-top: 60px;
+        }
+        
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 12px 20px;
+            margin: 4px 0;
+            border-radius: 4px;
+        }
+        
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        .sidebar .nav-link i {
+            margin-right: 10px;
+            width: 24px;
+            text-align: center;
+        }
+        
+        .topbar {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            height: 60px;
+            position: fixed;
+            width: 100%;
+            z-index: 100;
+        }
+        
+        .main-content {
+            padding-top: 80px;
+            padding-left: 250px;
+            padding-right: 20px;
+            padding-bottom: 40px;
+        }
+        
+        .card {
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+            border: none;
+        }
+        
+        .card-header {
+            background-color: white;
+            border-bottom: 1px solid #e0e0e0;
+            font-weight: 600;
+            padding: 15px 20px;
+        }
+        
+        .stats-card {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .stats-card i {
+            font-size: 2rem;
+            color: var(--accent);
+            margin-bottom: 15px;
+        }
+        
+        .stats-card h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+        
+        .stats-card p {
+            color: #666;
+            margin-bottom: 0;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary);
+            border-color: var(--secondary);
+        }
+        
+        .table th {
+            background-color: var(--light);
+            font-weight: 600;
+        }
+        
+        .module-section {
+            margin-bottom: 30px;
+        }
+        
+        .module-title {
+            border-bottom: 2px solid var(--light);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            color: var(--dark);
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 70px;
+                padding-top: 60px;
+            }
+            
+            .sidebar .nav-link span {
+                display: none;
+            }
+            
+            .sidebar .nav-link i {
+                margin-right: 0;
+            }
+            
+            .main-content {
+                padding-left: 90px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Navigation Bar -->
+    <nav class="topbar navbar navbar-expand">
+        <div class="container-fluid">
+            <a class="navbar-brand ms-2 fw-bold text-dark" href="#">
+                <i class="fas fa-graduation-cap me-2 text-primary"></i>Maritime System
+            </a>
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-user-circle me-1"></i> Academic Master
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Profile</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Settings</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Sidebar Navigation -->
+    <div class="sidebar col-md-3 col-lg-2 d-md-block">
+        <div class="position-sticky">
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#">
+                        <i class="fas fa-tachometer-alt"></i> <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="fas fa-user-graduate"></i> <span>Student Management</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="fas fa-chalkboard-teacher"></i> <span>Teacher Management</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="fas fa-school"></i> <span>Class & Stream Management</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="fas fa-book"></i> <span>Subject & Department</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="fas fa-calendar-alt"></i> <span>Academic Calendar</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="fas fa-clipboard-list"></i> <span>Results & Workspace</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="fas fa-chart-bar"></i> <span>Reports & Analytics</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="fas fa-users"></i> <span>Parent Management</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="fas fa-bullhorn"></i> <span>Notice Board</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="fas fa-cogs"></i> <span>System Settings</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container-fluid">
+            <!-- Dashboard Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0 text-gray-800">Academic Master Dashboard</h1>
+                <div>
+                    <button class="btn btn-primary"><i class="fas fa-sync-alt me-1"></i> Refresh Data</button>
+                </div>
+            </div>
+
+            <!-- Stats Overview -->
+            <div class="row">
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card stats-card">
+                        <i class="fas fa-user-graduate"></i>
+                        <h2>1,248</h2>
+                        <p>Total Students</p>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card stats-card">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                        <h2>64</h2>
+                        <p>Teaching Staff</p>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card stats-card">
+                        <i class="fas fa-school"></i>
+                        <h2>24</h2>
+                        <p>Active Classes</p>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card stats-card">
+                        <i class="fas fa-book"></i>
+                        <h2>32</h2>
+                        <p>Subjects</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Student Performance Chart -->
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Class Performance Overview</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="performanceChart" height="250"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Recent Announcements</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="alert alert-info p-2 mb-2">
+                                <small><strong>Term 1 Examinations</strong> - Starting next week</small>
+                            </div>
+                            <div class="alert alert-warning p-2 mb-2">
+                                <small><strong>Staff Meeting</strong> - Friday at 10:00 AM</small>
+                            </div>
+                            <div class="alert alert-success p-2 mb-2">
+                                <small><strong>Parent-Teacher Conference</strong> - Schedule released</small>
+                            </div>
+                            <div class="alert alert-primary p-2">
+                                <small><strong>New Curriculum Materials</strong> - Available for download</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activities -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="card-title mb-0">Recent Student Activities</h5>
+                            <div>
+                                <select class="form-select form-select-sm">
+                                    <option>All Classes</option>
+                                    <option>Form 1</option>
+                                    <option>Form 2</option>
+                                    <option>Form 3</option>
+                                    <option>Form 4</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Student</th>
+                                            <th>Class</th>
+                                            <th>Activity</th>
+                                            <th>Date</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>John Doe (S001)</td>
+                                            <td>Form 3A</td>
+                                            <td>Mathematics Assignment Submission</td>
+                                            <td>12 Oct 2023</td>
+                                            <td><span class="badge bg-success">Submitted</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Jane Smith (S045)</td>
+                                            <td>Form 2B</td>
+                                            <td>Science Quiz Result</td>
+                                            <td>11 Oct 2023</td>
+                                            <td><span class="badge bg-warning">Pending</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Michael Johnson (S123)</td>
+                                            <td>Form 4C</td>
+                                            <td>English Essay Submission</td>
+                                            <td>10 Oct 2023</td>
+                                            <td><span class="badge bg-success">Graded</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Sarah Williams (S087)</td>
+                                            <td>Form 1A</td>
+                                            <td>History Project Upload</td>
+                                            <td>9 Oct 2023</td>
+                                            <td><span class="badge bg-danger">Missing</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Robert Brown (S156)</td>
+                                            <td>Form 3B</td>
+                                            <td>Physics Test Result</td>
+                                            <td>8 Oct 2023</td>
+                                            <td><span class="badge bg-info">Reviewed</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Upcoming Events -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Upcoming Academic Events</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-3 mb-3">
+                                    <div class="card bg-light">
+                                        <div class="card-body text-center">
+                                            <h5 class="card-title">Term 1 Exams</h5>
+                                            <p class="card-text">15-20 Oct 2023</p>
+                                            <span class="badge bg-primary">All Classes</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="card bg-light">
+                                        <div class="card-body text-center">
+                                            <h5 class="card-title">Staff Meeting</h5>
+                                            <p class="card-text">22 Oct 2023</p>
+                                            <span class="badge bg-info">Teachers</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="card bg-light">
+                                        <div class="card-body text-center">
+                                            <h5 class="card-title">Parent Day</h5>
+                                            <p class="card-text">28 Oct 2023</p>
+                                            <span class="badge bg-success">All</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="card bg-light">
+                                        <div class="card-body text-center">
+                                            <h5 class="card-title">Sports Day</h5>
+                                            <p class="card-text">5 Nov 2023</p>
+                                            <span class="badge bg-warning">Students</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Initialize charts
+        document.addEventListener('DOMContentLoaded', function() {
+            // Performance Chart
+            var ctx = document.getElementById('performanceChart').getContext('2d');
+            var performanceChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Form 1', 'Form 2', 'Form 3', 'Form 4'],
+                    datasets: [
+                        {
+                            label: 'Mathematics',
+                            data: [75, 78, 82, 80],
+                            backgroundColor: 'rgba(54, 162, 235, 0.7)'
+                        },
+                        {
+                            label: 'Science',
+                            data: [72, 76, 79, 84],
+                            backgroundColor: 'rgba(255, 99, 132, 0.7)'
+                        },
+                        {
+                            label: 'English',
+                            data: [80, 82, 85, 88],
+                            backgroundColor: 'rgba(75, 192, 192, 0.7)'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: 60,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'Average Score'
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ResearchFlow | Advanced Research Companion</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        .section {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        .section.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .nav-item.active {
+            border-bottom: 3px solid #3b82f6;
+            color: #3b82f6;
+        }
+        .task-completed {
+            text-decoration: line-through;
+            color: #9ca3af;
+        }
+        .file-card:hover {
+            transform: translateY(-5px);
+            transition: transform 0.2s ease;
+        }
+        .search-result:hover {
+            background-color: #f3f4f6;
+        }
+        .note-card {
+            transition: all 0.2s ease;
+        }
+        .note-card:hover {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .data-cell {
+            min-height: 40px;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // Main App Component
+        const ResearchFlow = () => {
+            const [activeSection, setActiveSection] = useState('dashboard');
+            const [notes, setNotes] = useState([
+                { id: 1, title: 'Research Hypothesis', content: 'Initial hypothesis about the correlation between variables X and Y.', date: '2023-05-15' },
+                { id: 2, title: 'Methodology Notes', content: 'Consider using a double-blind study for more accurate results.', date: '2023-05-18' }
+            ]);
+            const [tasks, setTasks] = useState([
+                { id: 1, text: 'Literature review on previous studies', completed: true },
+                { id: 2, text: 'Prepare data collection instruments', completed: false },
+                { id: 3, text: 'Apply for ethics approval', completed: false }
+            ]);
+            const [files, setFiles] = useState([
+                { id: 1, name: 'Research Proposal.pdf', type: 'pdf', size: '2.4 MB', modified: '2023-05-10' },
+                { id: 2, name: 'Data Collection.xlsx', type: 'excel', size: '1.2 MB', modified: '2023-05-12' },
+                { id: 3, name: 'Literature Summary.docx', type: 'word', size: '0.8 MB', modified: '2023-05-15' }
+            ]);
+            const [searchQuery, setSearchQuery] = useState('');
+            const [searchResults, setSearchResults] = useState([]);
+            const [dataWorkspace, setDataWorkspace] = useState([
+                [1, 2, 3, 4, 5],
+                [6, 7, 8, 9, 10],
+                [11, 12, 13, 14, 15]
+            ]);
+            const [newTask, setNewTask] = useState('');
+            const [newNote, setNewNote] = useState({ title: '', content: '' });
+
+            // Navigation items
+            const navItems = [
+                { id: 'dashboard', label: 'Dashboard', icon: 'grid' },
+                { id: 'data', label: 'Data Workspace', icon: 'table' },
+                { id: 'files', label: 'File Manager', icon: 'folder' },
+                { id: 'notes', label: 'Research Journal', icon: 'book' },
+                { id: 'tasks', label: 'Task Manager', icon: 'list-check' },
+                { id: 'search', label: 'Research Search', icon: 'search' },
+                { id: 'collab', label: 'Collaboration', icon: 'users' },
+                { id: 'settings', label: 'Settings', icon: 'cog' }
+            ];
+
+            // Handle search
+            const handleSearch = (e) => {
+                e.preventDefault();
+                // Simulate search results
+                const mockResults = [
+                    { title: 'Academic Search Engine', content: 'Results for: ' + searchQuery, source: 'Google Scholar' },
+                    { title: 'Library Database', content: 'Research articles related to: ' + searchQuery, source: 'JSTOR' },
+                    { title: 'Research Publications', content: 'Recent studies on: ' + searchQuery, source: 'PubMed' }
+                ];
+                setSearchResults(mockResults);
+            };
+
+            // Add a new task
+            const addTask = () => {
+                if (newTask.trim()) {
+                    setTasks([...tasks, { 
+                        id: tasks.length + 1, 
+                        text: newTask, 
+                        completed: false 
+                    }]);
+                    setNewTask('');
+                }
+            };
+
+            // Toggle task completion
+            const toggleTask = (id) => {
+                setTasks(tasks.map(task => 
+                    task.id === id ? { ...task, completed: !task.completed } : task
+                ));
+            };
+
+            // Delete a task
+            const deleteTask = (id) => {
+                setTasks(tasks.filter(task => task.id !== id));
+            };
+
+            // Add a new note
+            const addNote = () => {
+                if (newNote.title.trim() && newNote.content.trim()) {
+                    setNotes([...notes, { 
+                        id: notes.length + 1, 
+                        title: newNote.title, 
+                        content: newNote.content,
+                        date: new Date().toISOString().split('T')[0]
+                    }]);
+                    setNewNote({ title: '', content: '' });
+                }
+            };
+
+            // Apply statistical analysis to data
+            const applyAnalysis = (analysisType) => {
+                alert('Applying ' + analysisType + ' to data...');
+                // In a real application, this would process the data workspace
+            };
+
+            // Calculate completion percentage for progress bar
+            const completionPercentage = tasks.length > 0 
+                ? (tasks.filter(t => t.completed).length / tasks.length) * 100 
+                : 0;
+
+            return (
+                <div className="flex h-screen bg-gray-100">
+                    {/* Sidebar Navigation */}
+                    <div className="w-64 bg-white shadow-md">
+                        <div className="p-5 border-b">
+                            <h1 className="text-xl font-bold text-blue-600">ResearchFlow</h1>
+                            <p className="text-sm text-gray-500">Research Companion Tool</p>
+                        </div>
+                        <nav className="mt-5">
+                            {navItems.map(item => (
+                                <button
+                                    key={item.id}
+                                    className={`w-full flex items-center p-4 text-gray-700 hover:bg-blue-50 hover:text-blue-600 ${activeSection === item.id ? 'active bg-blue-50 text-blue-600' : ''}`}
+                                    onClick={() => setActiveSection(item.id)}
+                                >
+                                    <i className={`fas fa-${item.icon} mr-3`}></i>
+                                    {item.label}
+                                </button>
+                            ))}
+                        </nav>
+                        <div className="absolute bottom-0 w-64 p-4 border-t bg-white">
+                            <div className="flex items-center">
+                                <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold">
+                                    JD
+                                </div>
+                                <div className="ml-3">
+                                    <p className="text-sm font-medium">Dr. Jane Doe</p>
+                                    <p className="text-xs text-gray-500">Researcher</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Main Content */}
+                    <div className="flex-1 overflow-auto">
+                        {/* Header */}
+                        <header className="bg-white shadow-sm">
+                            <div className="flex justify-between items-center px-8 py-4">
+                                <h2 className="text-2xl font-semibold text-gray-800 capitalize">
+                                    {navItems.find(item => item.id === activeSection)?.label || 'Dashboard'}
+                                </h2>
+                                <div className="flex items-center space-x-4">
+                                    <div className="relative">
+                                        <input 
+                                            type="text" 
+                                            placeholder="Quick search..." 
+                                            className="pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        />
+                                        <i className="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                                    </div>
+                                    <button className="p-2 rounded-full bg-gray-100 text-gray-600">
+                                        <i className="fas fa-bell"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </header>
+
+                        {/* Dashboard Section */}
+                        <section id="dashboard" className={`section p-8 ${activeSection === 'dashboard' ? 'active' : ''}`}>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                                <div className="bg-white rounded-lg shadow p-6">
+                                    <div className="flex items-center">
+                                        <div className="p-3 rounded-lg bg-blue-100 text-blue-600">
+                                            <i className="fas fa-file-alt text-xl"></i>
+                                        </div>
+                                        <div className="ml-4">
+                                            <h3 className="text-sm font-medium text-gray-500">Research Files</h3>
+                                            <p className="text-2xl font-bold">{files.length}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="bg-white rounded-lg shadow p-6">
+                                    <div className="flex items-center">
+                                        <div className="p-3 rounded-lg bg-green-100 text-green-600">
+                                            <i className="fas fa-tasks text-xl"></i>
+                                        </div>
+                                        <div className="ml-4">
+                                            <h3 className="text-sm font-medium text-gray-500">Pending Tasks</h3>
+                                            <p className="text-2xl font-bold">{tasks.filter(t => !t.completed).length}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="bg-white rounded-lg shadow p-6">
+                                    <div className="flex items-center">
+                                        <div className="p-3 rounded-lg bg-purple-100 text-purple-600">
+                                            <i className="fas fa-sticky-note text-xl"></i>
+                                        </div>
+                                        <div className="ml-4">
+                                            <h3 className="text-sm font-medium text-gray-500">Research Notes</h3>
+                                            <p className="text-2xl font-bold">{notes.length}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="bg-white rounded-lg shadow p-6">
+                                    <div className="flex items-center">
+                                        <div className="p-3 rounded-lg bg-yellow-100 text-yellow-600">
+                                            <i className="fas fa-database text-xl"></i>
+                                        </div>
+                                        <div className="ml-4">
+                                            <h3 className="text-sm font-medium text-gray-500">Data Points</h3>
+                                            <p className="text-2xl font-bold">247</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                <div className="bg-white rounded-lg shadow overflow-hidden">
+                                    <div className="px-6 py-4 border-b">
+                                        <h3 className="text-lg font-medium text-gray-800">Recent Notes</h3>
+                                    </div>
+                                    <div className="divide-y">
+                                        {notes.slice(0, 3).map(note => (
+                                            <div key={note.id} className="p-6 hover:bg-gray-50 cursor-pointer">
+                                                <h4 className="font-medium text-gray-800">{note.title}</h4>
+                                                <p className="text-sm text-gray-600 mt-1">{note.content.substring(0, 80)}...</p>
+                                                <p className="text-xs text-gray-500 mt-2">{note.date}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="bg-white rounded-lg shadow overflow-hidden">
+                                    <div className="px-6 py-4 border-b">
+                                        <h3 className="text-lg font-medium text-gray-800">Upcoming Tasks</h3>
+                                    </div>
+                                    <div className="divide-y">
+                                        {tasks.filter(t => !t.completed).slice(0, 3).map(task => (
+                                            <div key={task.id} className="p-6 hover:bg-gray-50 cursor-pointer">
+                                                <div className="flex items-center">
+                                                    <input 
+                                                        type="checkbox" 
+                                                        className="rounded text-blue-600 focus:ring-blue-500"
+                                                        checked={task.completed}
+                                                        onChange={() => toggleTask(task.id)}
+                                                    />
+                                                    <span className="ml-3 text-gray-800">{task.text}</span>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* Data Workspace Section */}
+                        <section id="data" className={`section p-8 ${activeSection === 'data' ? 'active' : ''}`}>
+                            <div className="bg-white rounded-lg shadow mb-6">
+                                <div className="px-6 py-4 border-b flex justify-between items-center">
+                                    <h3 className="text-lg font-medium text-gray-800">Data Analysis Workspace</h3>
+                                    <div className="flex space-x-2">
+                                        <button className="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg text-sm font-medium hover:bg-blue-200">
+                                            <i className="fas fa-plus mr-2"></i>Add Column
+                                        </button>
+                                        <button className="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg text-sm font-medium hover:bg-blue-200">
+                                            <i className="fas fa-plus mr-2"></i>Add Row
+                                        </button>
+                                        <div className="relative">
+                                            <button className="px-4 py-2 bg-green-100 text-green-700 rounded-lg text-sm font-medium hover:bg-green-200">
+                                                <i className="fas fa-calculator mr-2"></i>Analyze Data
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="p-6 overflow-auto">
+                                    <table className="w-full">
+                                        <thead>
+                                            <tr className="bg-gray-50">
+                                                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Variable A</th>
+                                                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Variable B</th>
+                                                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Variable C</th>
+                                                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Variable D</th>
+                                                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Variable E</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {dataWorkspace.map((row, rowIndex) => (
+                                                <tr key={rowIndex} className={rowIndex % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                                                    {row.map((cell, cellIndex) => (
+                                                        <td key={cellIndex} className="p-3 border-b data-cell">
+                                                            {cell}
+                                                        </td>
+                                                    ))}
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div className="bg-white rounded-lg shadow">
+                                <div className="px-6 py-4 border-b">
+                                    <h3 className="text-lg font-medium text-gray-800">Quick Analysis Tools</h3>
+                                </div>
+                                <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                    <button 
+                                        className="p-4 bg-blue-50 rounded-lg text-center hover:bg-blue-100"
+                                        onClick={() => applyAnalysis('Descriptive Statistics')}
+                                    >
+                                        <i className="fas fa-chart-bar text-blue-600 text-2xl mb-2"></i>
+                                        <h4 className="font-medium">Descriptive Stats</h4>
+                                        <p className="text-sm text-gray-600">Mean, median, mode, etc.</p>
+                                    </button>
+                                    <button 
+                                        className="p-4 bg-green-50 rounded-lg text-center hover:bg-green-100"
+                                        onClick={() => applyAnalysis('Correlation Analysis')}
+                                    >
+                                        <i className="fas fa-project-diagram text-green-600 text-2xl mb-2"></i>
+                                        <h4 className="font-medium">Correlation</h4>
+                                        <p className="text-sm text-gray-600">Find relationships between variables</p>
+                                    </button>
+                                    <button 
+                                        className="p-4 bg-purple-50 rounded-lg text-center hover:bg-purple-100"
+                                        onClick={() => applyAnalysis('Regression Analysis')}
+                                    >
+                                        <i className="fas fa-chart-line text-purple-600 text-2xl mb-2"></i>
+                                        <h4 className="font-medium">Regression</h4>
+                                        <p className="text-sm text-gray-600">Predictive modeling</p>
+                                    </button>
+                                    <button 
+                                        className="p-4 bg-yellow-50 rounded-lg text-center hover:bg-yellow-100"
+                                        onClick={() => applyAnalysis('T-Test')}
+                                    >
+                                        <i className="fas fa-balance-scale text-yellow-600 text-2xl mb-2"></i>
+                                        <h4 className="font-medium">T-Test</h4>
+                                        <p className="text-sm text-gray-600">Compare means between groups</p>
+                                    </button>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* File Manager Section */}
+                        <section id="files" className={`section p-8 ${activeSection === 'files' ? 'active' : ''}`}>
+                            <div className="bg-white rounded-lg shadow mb-6">
+                                <div className="px-6 py-4 border-b flex justify-between items-center">
+                                    <h3 className="text-lg font-medium text-gray-800">Research Files</h3>
+                                    <button className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700">
+                                        <i className="fas fa-upload mr-2"></i>Upload Files
+                                    </button>
+                                </div>
+                                <div className="p-6">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                        {files.map(file => (
+                                            <div key={file.id} className="file-card border rounded-lg p-4 bg-white hover:shadow-md">
+                                                <div className="flex items-center mb-3">
+                                                    <div className={`p-2 rounded-lg ${
+                                                        file.type === 'pdf' ? 'bg-red-100 text-red-600' : 
+                                                        file.type === 'excel' ? 'bg-green-100 text-green-600' : 
+                                                        'bg-blue-100 text-blue-600'
+                                                    }`}>
+                                                        <i className={`fas fa-${
+                                                            file.type === 'pdf' ? 'file-pdf' : 
+                                                            file.type === 'excel' ? 'file-excel' : 
+                                                            'file-word'
+                                                        }`}></i>
+                                                    </div>
+                                                    <div className="ml-3 overflow-hidden">
+                                                        <h4 className="font-medium text-gray-800 truncate">{file.name}</h4>
+                                                        <p className="text-sm text-gray-600">{file.size}</p>
+                                                    </div>
+                                                </div>
+                                                <div className="flex justify-between items-center text-sm text-gray-500">
+                                                    <span>Modified: {file.modified}</span>
+                                                    <div className="flex space-x-2">
+                                                        <button className="text-blue-600 hover:text-blue-800">
+                                                            <i className="fas fa-download"></i>
+                                                        </button>
+                                                        <button className="text-gray-600 hover:text-gray-800">
+                                                            <i className="fas fa-ellipsis-v"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="bg-white rounded-lg shadow">
+                                <div className="px-6 py-4 border-b">
+                                    <h3 className="text-lg font-medium text-gray-800">File Activity</h3>
+                                </div>
+                                <div className="p-6">
+                                    <div className="flex items-center justify-between p-4 border-b">
+                                        <div className="flex items-center">
+                                            <div className="p-2 rounded-lg bg-gray-100 text-gray-600">
+                                                <i className="fas fa-file-upload"></i>
+                                            </div>
+                                            <div className="ml-4">
+                                                <h4 className="font-medium">Research Proposal.pdf</h4>
+                                                <p className="text-sm text-gray-600">Uploaded by you</p>
+                                            </div>
+                                        </div>
+                                        <span className="text-sm text-gray-500">2 hours ago</span>
+                                    </div>
+                                    <div className="flex items-center justify-between p-4 border-b">
+                                        <div className="flex items-center">
+                                            <div className="p-2 rounded-lg bg-gray-100 text-gray-600">
+                                                <i className="fas fa-file-download"></i>
+                                            </div>
+                                            <div className="ml-4">
+                                                <h4 className="font-medium">Data Collection.xlsx</h4>
+                                                <p className="text-sm text-gray-600">Downloaded by collaborator</p>
+                                            </div>
+                                        </div>
+                                        <span className="text-sm text-gray-500">Yesterday</span>
+                                    </div>
+                                    <div className="flex items-center justify-between p-4">
+                                        <div className="flex items-center">
+                                            <div className="p-2 rounded-lg bg-gray-100 text-gray-600">
+                                                <i className="fas fa-comment"></i>
+                                            </div>
+                                            <div className="ml-4">
+                                                <h4 className="font-medium">Literature Summary.docx</h4>
+                                                <p className="text-sm text-gray-600">New comment added</p>
+                                            </div>
+                                        </div>
+                                        <span className="text-sm text-gray-500">2 days ago</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* Research Journal Section */}
+                        <section id="notes" className={`section p-8 ${activeSection === 'notes' ? 'active' : ''}`}>
+                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                                <div className="lg:col-span-2">
+                                    <div className="bg-white rounded-lg shadow mb-6">
+                                        <div className="px-6 py-4 border-b">
+                                            <h3 className="text-lg font-medium text-gray-800">Research Notes</h3>
+                                        </div>
+                                        <div className="p-6">
+                                            {notes.map(note => (
+                                                <div key={note.id} className="note-card mb-6 p-4 border rounded-lg bg-white last:mb-0">
+                                                    <h4 className="font-medium text-lg text-gray-800 mb-2">{note.title}</h4>
+                                                    <p className="text-gray-600 mb-3">{note.content}</p>
+                                                    <div className="flex justify-between items-center text-sm text-gray-500">
+                                                        <span>{note.date}</span>
+                                                        <div className="flex space-x-3">
+                                                            <button className="text-blue-600 hover:text-blue-800">
+                                                                <i className="fas fa-edit"></i>
+                                                            </button>
+                                                            <button className="text-red-600 hover:text-red-800">
+                                                                <i className="fas fa-trash"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div className="bg-white rounded-lg shadow sticky top-6">
+                                        <div className="px-6 py-4 border-b">
+                                            <h3 className="text-lg font-medium text-gray-800">Add New Note</h3>
+                                        </div>
+                                        <div className="p-6">
+                                            <div className="mb-4">
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                                                <input 
+                                                    type="text" 
+                                                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                    value={newNote.title}
+                                                    onChange={(e) => setNewNote({...newNote, title: e.target.value})}
+                                                    placeholder="Note title"
+                                                />
+                                            </div>
+                                            <div className="mb-4">
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">Content</label>
+                                                <textarea 
+                                                    rows="5"
+                                                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                    value={newNote.content}
+                                                    onChange={(e) => setNewNote({...newNote, content: e.target.value})}
+                                                    placeholder="Write your research notes here..."
+                                                ></textarea>
+                                            </div>
+                                            <button 
+                                                className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                                                onClick={addNote}
+                                            >
+                                                Save Note
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* Task Manager Section */}
+                        <section id="tasks" className={`section p-8 ${activeSection === 'tasks' ? 'active' : ''}`}>
+                            <div className="bg-white rounded-lg shadow mb-6">
+                                <div className="px-6 py-4 border-b">
+                                    <h3 className="text-lg font-medium text-gray-800">Research Tasks</h3>
+                                </div>
+                                <div className="p-6">
+                                    <div className="flex mb-6">
+                                        <input 
+                                            type="text" 
+                                            className="flex-1 px-4 py-2 border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            value={newTask}
+                                            onChange={(e) => setNewTask(e.target.value)}
+                                            placeholder="Add a new research task..."
+                                        />
+                                        <button 
+                                            className="px-6 bg-blue-600 text-white rounded-r-lg hover:bg-blue-700"
+                                            onClick={addTask}
+                                        >
+                                            Add
+                                        </button>
+                                    </div>
+
+                                    <div className="space-y-3">
+                                        {tasks.map(task => (
+                                            <div key={task.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50">
+                                                <div className="flex items-center">
+                                                    <input 
+                                                        type="checkbox" 
+                                                        className="h-5 w-5 rounded text-blue-600 focus:ring-blue-500"
+                                                        checked={task.completed}
+                                                        onChange={() => toggleTask(task.id)}
+                                                    />
+                                                    <span className={`ml-3 ${task.completed ? 'task-completed' : 'text-gray-800'}`}>
+                                                        {task.text}
+                                                    </span>
+                                                </div>
+                                                <button 
+                                                    className="text-red-600 hover:text-red-800"
+                                                    onClick={() => deleteTask(task.id)}
+                                                >
+                                                    <i className="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="bg-white rounded-lg shadow">
+                                <div className="px-6 py-4 border-b">
+                                    <h3 className="text-lg font-medium text-gray-800">Task Statistics</h3>
+                                </div>
+                                <div className="p-6">
+                                    <div className="flex items-center justify-between mb-6">
+                                        <div>
+                                            <h4 className="text-sm font-medium text-gray-600">Total Tasks</h4>
+                                            <p className="text-2xl font-bold">{tasks.length}</p>
+                                        </div>
+                                        <div>
+                                            <h4 className="text-sm font-medium text-gray-600">Completed</h4>
+                                            <p className="text-2xl font-bold text-green-600">{tasks.filter(t => t.completed).length}</p>
+                                        </div>
+                                        <div>
+                                            <h4 className="text-sm font-medium text-gray-600">Pending</h4>
+                                            <p className="text-2xl font-bold text-yellow-600">{tasks.filter(t => !t.completed).length}</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="w-full bg-gray-200 rounded-full h-2.5">
+                                        <div 
+                                            className="bg-blue-600 h-2.5 rounded-full" 
+                                            style={{ width: `${completionPercentage}%` }}
+                                        ></div>
+                                    </div>
+                                    <p className="text-sm text-gray-600 mt-2">
+                                        {Math.round(completionPercentage)}% of tasks completed
+                                    </p>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* Research Search Section */}
+                        <section id="search" className={`section p-8 ${activeSection === 'search' ? 'active' : ''}`}>
+                            <div className="bg-white rounded-lg shadow mb-6">
+                                <div className="px-6 py-4 border-b">
+                                    <h3 className="text-lg font-medium text-gray-800">Integrated Research Search</h3>
+                                </div>
+                                <div className="p-6">
+                                    <form onSubmit={handleSearch} className="flex mb-6">
+                                        <div className="relative flex-1">
+                                            <input 
+                                                type="text" 
+                                                className="w-full pl-12 pr-4 py-3 border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                value={searchQuery}
+                                                onChange={(e) => setSearchQuery(e.target.value)}
+                                                placeholder="Search academic databases..."
+                                            />
+                                            <i className="fas fa-search absolute left-4 top-3.5 text-gray-400"></i>
+                                        </div>
+                                        <button 
+                                            type="submit"
+                                            className="px-6 bg-blue-600 text-white rounded-r-lg hover:bg-blue-700"
+                                        >
+                                            Search
+                                        </button>
+                                    </form>
+
+                                    <div className="rounded-lg border">
+                                        {searchResults.map((result, index) => (
+                                            <div key={index} className="search-result p-4 border-b last:border-b-0">
+                                                <h4 className="font-medium text-blue-600">{result.title}</h4>
+                                                <p className="text-sm text-gray-600 my-1">{result.content}</p>
+                                                <div className="flex justify-between items-center text-sm">
+                                                    <span className="text-gray-500">Source: {result.source}</span>
+                                                    <div className="flex space-x-3">
+                                                        <button className="text-blue-600 hover:text-blue-800">
+                                                            <i className="fas fa-copy mr-1"></i> Copy
+                                                        </button>
+                                                        <button className="text-green-600 hover:text-green-800">
+                                                            <i className="fas fa-save mr-1"></i> Save
+                                                        </button>
+                                                        <button className="text-purple-600 hover:text-purple-800">
+                                                            <i className="fas fa-link mr-1"></i> Cite
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="bg-white rounded-lg shadow">
+                                <div className="px-6 py-4 border-b">
+                                    <h3 className="text-lg font-medium text-gray-800">Search History</h3>
+                                </div>
+                                <div className="p-6">
+                                    <div className="space-y-4">
+                                        <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                                            <div>
+                                                <h4 className="font-medium">"quantum computing applications"</h4>
+                                                <p className="text-sm text-gray-600">Searched 2 days ago</p>
+                                            </div>
+                                            <button className="text-blue-600 hover:text-blue-800">
+                                                <i className="fas fa-redo"></i>
+                                            </button>
+                                        </div>
+                                        <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                                            <div>
+                                                <h4 className="font-medium">"machine learning in healthcare"</h4>
+                                                <p className="text-sm text-gray-600">Searched 1 week ago</p>
+                                            </div>
+                                            <button className="text-blue-600 hover:text-blue-800">
+                                                <i className="fas fa-redo"></i>
+                                            </button>
+                                        </div>
+                                        <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                                            <div>
+                                                <h4 className="font-medium">"renewable energy storage solutions"</h4>
+                                                <p className="text-sm text-gray-600">Searched 2 weeks ago</p>
+                                            </div>
+                                            <button className="text-blue-600 hover:text-blue-800">
+                                                <i className="fas fa-redo"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* Collaboration Section */}
+                        <section id="collab" className={`section p-8 ${activeSection === 'collab' ? 'active' : ''}`}>
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                <div className="bg-white rounded-lg shadow">
+                                    <div className="px-6 py-4 border-b">
+                                        <h3 className="text-lg font-medium text-gray-800">Project Team</h3>
+                                    </div>
+                                    <div className="p-6">
+                                        <div className="space-y-4">
+                                            <div className="flex items-center p-3 border rounded-lg">
+                                                <div className="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold">
+                                                    JD
+                                                </div>
+                                                <div className="ml-4">
+                                                    <h4 className="font-medium">Dr. Jane Doe</h4>
+                                                    <p className="text-sm text-gray-600">Principal Investigator</p>
+                                                </div>
+                                                <span className="ml-auto text-sm text-green-600 flex items-center">
+                                                    <span className="h-2 w-2 rounded-full bg-green-600 mr-1"></span> Online
+                                                </span>
+                                            </div>
+                                            <div className="flex items-center p-3 border rounded-lg">
+                                                <div className="w-12 h-12 rounded-full bg-green-500 flex items-center justify-center text-white font-bold">
+                                                    JS
+                                                </div>
+                                                <div className="ml-4">
+                                                    <h4 className="font-medium">Dr. John Smith</h4>
+                                                    <p className="text-sm text-gray-600">Research Associate</p>
+                                                </div>
+                                                <span className="ml-auto text-sm text-gray-500 flex items-center">
+                                                    <span className="h-2 w-2 rounded-full bg-gray-500 mr-1"></span> Offline
+                                                </span>
+                                            </div>
+                                            <div className="flex items-center p-3 border rounded-lg">
+                                                <div className="w-12 h-12 rounded-full bg-purple-500 flex items-center justify-center text-white font-bold">
+                                                    EM
+                                                </div>
+                                                <div className="ml-4">
+                                                    <h4 className="font-medium">Emma Wilson</h4>
+                                                    <p className="text-sm text-gray-600">Research Assistant</p>
+                                                </div>
+                                                <span className="ml-auto text-sm text-green-600 flex items-center">
+                                                    <span className="h-2 w-2 rounded-full bg-green-600 mr-1"></span> Online
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <button className="w-full mt-6 px-4 py-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-blue-500 hover:text-blue-600">
+                                            <i className="fas fa-plus mr-2"></i>Invite Collaborator
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div className="bg-white rounded-lg shadow">
+                                    <div className="px-6 py-4 border-b">
+                                        <h3 className="text-lg font-medium text-gray-800">Project Discussion</h3>
+                                    </div>
+                                    <div className="p-6">
+                                        <div className="mb-6 h-64 overflow-y-auto space-y-4">
+                                            <div className="flex">
+                                                <div className="w-10 h-10 rounded-full bg-blue-500 flex-shrink-0 flex items-center justify-center text-white font-bold">
+                                                    JD
+                                                </div>
+                                                <div className="ml-3">
+                                                    <div className="bg-gray-100 rounded-lg py-2 px-4">
+                                                        <h4 className="font-medium">Dr. Jane Doe</h4>
+                                                        <p className="text-gray-700">Has everyone had a chance to review the latest dataset I uploaded?</p>
+                                                    </div>
+                                                    <p className="text-xs text-gray-500 mt-1">2 hours ago</p>
+                                                </div>
+                                            </div>
+                                            <div className="flex">
+                                                <div className="w-10 h-10 rounded-full bg-purple-500 flex-shrink-0 flex items-center justify-center text-white font-bold">
+                                                    EM
+                                                </div>
+                                                <div className="ml-3">
+                                                    <div className="bg-gray-100 rounded-lg py-2 px-4">
+                                                        <h4 className="font-medium">Emma Wilson</h4>
+                                                        <p className="text-gray-700">Yes, I've started the preliminary analysis. The correlation between variables A and B is stronger than we anticipated.</p>
+                                                    </div>
+                                                    <p className="text-xs text-gray-500 mt-1">1 hour ago</p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex">
+                                            <input 
+                                                type="text" 
+                                                className="flex-1 px-4 py-2 border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                placeholder="Type a message..."
+                                            />
+                                            <button className="px-4 bg-blue-600 text-white rounded-r-lg hover:bg-blue-700">
+                                                <i className="fas fa-paper-plane"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* Settings Section */}
+                        <section id="settings" className={`section p-8 ${activeSection === 'settings' ? 'active' : ''}`}>
+                            <div className="bg-white rounded-lg shadow">
+                                <div className="px-6 py-4 border-b">
+                                    <h3 className="text-lg font-medium text-gray-800">Account Settings</h3>
+                                </div>
+                                <div className="p-6">
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                        <div className="md:col-span-2">
+                                            <h4 className="text-lg font-medium text-gray-800 mb-4">Profile Information</h4>
+                                            <div className="space-y-4">
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                                                    <input 
+                                                        type="text" 
+                                                        className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                        defaultValue="Dr. Jane Doe"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                                                    <input 
+                                                        type="email" 
+                                                        className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                        defaultValue="j.doe@researchuniversity.edu"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">Institution</label>
+                                                    <input 
+                                                        type="text" 
+                                                        className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                        defaultValue="Research University"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">Department</label>
+                                                    <input 
+                                                        type="text" 
+                                                        className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                        defaultValue="Data Science and Research Methods"
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            <h4 className="text-lg font-medium text-gray-800 mt-8 mb-4">Research Preferences</h4>
+                                            <div className="space-y-4">
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">Default Analysis Method</label>
+                                                    <select className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                                        <option>Descriptive Statistics</option>
+                                                        <option>Regression Analysis</option>
+                                                        <option>Correlation Analysis</option>
+                                                        <option>T-Test</option>
+                                                    </select>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">Preferred Citation Format</label>
+                                                    <select className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                                        <option>APA</option>
+                                                        <option>MLA</option>
+                                                        <option>Chicago</option>
+                                                        <option>IEEE</option>
+                                                    </select>
+                                                </div>
+                                                <div className="flex items-center">
+                                                    <input 
+                                                        type="checkbox" 
+                                                        id="auto-save"
+                                                        className="h-4 w-4 rounded text-blue-600 focus:ring-blue-500"
+                                                        defaultChecked
+                                                    />
+                                                    <label htmlFor="auto-save" className="ml-2 text-sm text-gray-700">Auto-save notes and data</label>
+                                                </div>
+                                            </div>
+
+                                            <button className="mt-8 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                                                Save Changes
+                                            </button>
+                                        </div>
+
+                                        <div>
+                                            <h4 className="text-lg font-medium text-gray-800 mb-4">Profile Photo</h4>
+                                            <div className="flex flex-col items-center">
+                                                <div className="w-32 h-32 rounded-full bg-blue-500 flex items-center justify-center text-white text-4xl font-bold mb-4">
+                                                    JD
+                                                </div>
+                                                <button className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+                                                    Change Photo
+                                                </button>
+                                                <button className="mt-2 px-4 py-2 text-red-600 hover:text-red-800">
+                                                    Remove Photo
+                                                </button>
+                                            </div>
+
+                                            <h4 className="text-lg font-medium text-gray-800 mt-8 mb-4">Subscription</h4>
+                                            <div className="border rounded-lg p-4">
+                                                <h5 className="font-medium text-gray-800">ResearchFlow Pro</h5>
+                                                <p className="text-sm text-gray-600 mt-1">Unlimited projects, advanced analytics, and priority support</p>
+                                                <button className="w-full mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                                                    Upgrade Now
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            );
+        };
+
+        // Render the application
+        ReactDOM.render(<ResearchFlow />, document.getElementById('root'));
+    </script>
+</body>
+</html>

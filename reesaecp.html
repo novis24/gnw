@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ResearchFlow | Advanced Research Companion</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Custom Styles */
+        .section {
+            display: none;
+            position: relative;
+            min-height: 400px;
+        }
+        .section.active {
+            display: block;
+        }
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .nav-item.active {
+            border-bottom: 3px solid #3b82f6;
+            color: #3b82f6;
+        }
+        .task-completed {
+            text-decoration: line-through;
+            color: #9ca3af;
+        }
+        .file-card:hover {
+            transform: translateY(-5px);
+            transition: transform 0.2s ease;
+        }
+        .search-result:hover {
+            background-color: #f3f4f6;
+        }
+        .note-card {
+            transition: all 0.2s ease;
+        }
+        .note-card:hover {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .data-cell {
+            min-height: 40px;
+        }
+        .loader {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .loading .loader {
+            opacity: 1;
+            visibility: visible;
+        }
+        .loading .content {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        .sidebar {
+            width: 260px;
+            transition: all 0.3s ease;
+        }
+        .sidebar.collapsed {
+            width: 70px;
+        }
+        .main-content {
+            margin-left: 260px;
+            transition: all 0.3s ease;
+        }
+        .main-content.expanded {
+            margin-left: 70px;
+        }
+        .logo-text {
+            transition: opacity 0.3s ease;
+        }
+        .sidebar.collapsed .logo-text {
+            opacity: 0;
+            display: none;
+        }
+        .nav-label {
+            transition: opacity 0.3s ease;
+        }
+        .sidebar.collapsed .nav-label {
+            opacity: 0;
+            display: none;
+        }
+        .user-info {
+            transition: opacity 0.3s ease;
+        }
+        .sidebar.collapsed .user-info {
+            opacity: 0;
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation & Layout Structure -->
+    <div class="flex">
+        <!-- Sidebar -->
+        <div class="sidebar bg-white shadow-md h-screen fixed z-10">
+            <div class="p-5 border-b flex items-center justify-between">
+                <div class="flex items-center">
+                    <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold mr-3">
+                        RF
+                    </div>
+                    <div class="logo-text">
+                        <h1 class="text-xl font-bold text-blue-600">ResearchFlow</h1>
+                        <p class="text-xs text-gray-500">Research Companion</p>
+                    </div>
+                </div>
+                <button id="toggleSidebar" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+            <nav class="mt-5">
+                <a href="#dashboard" class="nav-item w-full flex items-center p-4 text-gray-700 hover:bg-blue-50 hover:text-blue-600">
+                    <i class="fas fa-grid mr-3"></i>
+                    <span class="nav-label">Dashboard</span>
+                </a>
+                <a href="#data" class="nav-item w-full flex items-center p-4 text-gray-700 hover:bg-blue-50 hover:text-blue-600">
+                    <i class="fas fa-table mr-3"></i>
+                    <span class="nav-label">Data Workspace</span>
+                </a>
+                <a href="#files" class="nav-item w-full flex items-center p-4 text-gray-700 hover:bg-blue-50 hover:text-blue-600">
+                    <i class="fas fa-folder mr-3"></i>
+                    <span class="nav-label">File Manager</span>
+                </a>
+                <a href="#notes" class="nav-item w-full flex items-center p-4 text-gray-700 hover:bg-blue-50 hover:text-blue-600">
+                    <i class="fas fa-book mr-3"></i>
+                    <span class="nav-label">Research Journal</span>
+                </a>
+                <a href="#tasks" class="nav-item w-full flex items-center p-4 text-gray-700 hover:bg-blue-50 hover:text-blue-600">
+                    <i class="fas fa-list-check mr-3"></i>
+                    <span class="nav-label">Task Manager</span>
+                </a>
+                <a href="#search" class="nav-item w-full flex items-center p-4 text-gray-700 hover:bg-blue-50 hover:text-blue-600">
+                    <i class="fas fa-search mr-3"></i>
+                    <span class="nav-label">Research Search</span>
+                </a>
+                <a href="#collab" class="nav-item w-full flex items-center p-4 text-gray-700 hover:bg-blue-50 hover:text-blue-600">
+                    <i class="fas fa-users mr-3"></i>
+                    <span class="nav-label">Collaboration</span>
+                </a>
+                <a href="#settings" class="nav-item w-full flex items-center p-4 text-gray-700 hover:bg-blue-50 hover:text-blue-600">
+                    <i class="fas fa-cog mr-3"></i>
+                    <span class="nav-label">Settings</span>
+                </a>
+            </nav>
+            <div class="absolute bottom-0 w-full p-4 border-t bg-white">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold">
+                        JD
+                    </div>
+                    <div class="user-info ml-3">
+                        <p class="text-sm font-medium">Dr. Jane Doe</p>
+                        <p class="text-xs text-gray-500">Researcher</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content flex-1">
+            <!-- Header -->
+            <header class="bg-white shadow-sm">
+                <div class="flex justify-between items-center px-8 py-4">
+                    <h2 class="text-2xl font-semibold text-gray-800" id="pageTitle">Dashboard</h2>
+                    <div class="flex items-center space-x-4">
+                        <div class="relative">
+                            <input 
+                                type="text" 
+                                placeholder="Quick search..." 
+                                class="pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            />
+                            <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                        </div>
+                        <button class="p-2 rounded-full bg-gray-100 text-gray-600 relative">
+                            <i class="fas fa-bell"></i>
+                            <span class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center">3</span>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="section p-8 active">
+                <div class="loader">
+                    <div class="text-center">
+                        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+                        <p class="mt-4 text-gray-600">Loading dashboard data...</p>
+                    </div>
+                </div>
+                <div class="content fade-in">
+                    <!-- Dashboard content will be loaded here -->
+                </div>
+            </section>
+
+            <!-- Data Workspace Section -->
+            <section id="data" class="section p-8">
+                <div class="loader">
+                    <div class="text-center">
+                        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+                        <p class="mt-4 text-gray-600">Loading data workspace...</p>
+                    </div>
+                </div>
+                <div class="content fade-in">
+                    <!-- Data workspace content will be loaded here -->
+                </div>
+            </section>
+
+            <!-- File Manager Section -->
+            <section id="files" class="section p-8">
+                <div class="loader">
+                    <div class="text-center">
+                        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+                        <p class="mt-4 text-gray-600">Loading file manager...</p>
+                    </div>
+                </div>
+                <div class="content fade-in">
+                    <!-- File manager content will be loaded here -->
+                </div>
+            </section>
+
+            <!-- Research Journal Section -->
+            <section id="notes" class="section p-8">
+                <div class="loader">
+                    <div class="text-center">
+                        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+                        <p class="mt-4 text-gray-600">Loading research journal...</p>
+                    </div>
+                </div>
+                <div class="content fade-in">
+                    <!-- Research journal content will be loaded here -->
+                </div>
+            </section>
+
+            <!-- Task Manager Section -->
+            <section id="tasks" class="section p-8">
+                <div class="loader">
+                    <div class="text-center">
+                        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+                        <p class="mt-4 text-gray-600">Loading task manager...</p>
+                    </div>
+                </div>
+                <div class="content fade-in">
+                    <!-- Task manager content will be loaded here -->
+                </div>
+            </section>
+
+            <!-- Research Search Section -->
+            <section id="search" class="section p-8">
+                <div class="loader">
+                    <div class="text-center">
+                        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+                        <p class="mt-4 text-gray-600">Loading research search...</p>
+                    </div>
+                </div>
+                <div class="content fade-in">
+                    <!-- Research search content will be loaded here -->
+                </div>
+            </section>
+
+            <!-- Collaboration Section -->
+            <section id="collab" class="section p-8">
+                <div class="loader">
+                    <div class="text-center">
+                        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+                        <p class="mt-4 text-gray-600">Loading collaboration tools...</p>
+                    </div>
+                </div>
+                <div class="content fade-in">
+                    <!-- Collaboration content will be loaded here -->
+                </div>
+            </section>
+
+            <!-- Settings Section -->
+            <section id="settings" class="section p-8">
+                <div class="loader">
+                    <div class="text-center">
+                        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+                        <p class="mt-4 text-gray-600">Loading settings...</p>
+                    </div>
+                </div>
+                <div class="content fade-in">
+                    <!-- Settings content will be loaded here -->
+                </div>
+            </section>
+
+            <!-- Footer -->
+            <footer class="bg-gray-100 border-t mt-8 py-6 px-8">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div class="text-sm text-gray-600 mb-4 md:mb-0">
+                        &copy; 2023 ResearchFlow. Powered by <span class="font-semibold">NovisTech</span>. All rights reserved.
+                    </div>
+                    <div class="flex items-center space-x-6">
+                        <div class="flex items-center text-sm text-gray-600">
+                            <i class="fas fa-phone-alt mr-2"></i>
+                            <span>0628245294</span>
+                        </div>
+                        <div class="flex items-center text-sm text-gray-600">
+                            <i class="fas fa-envelope mr-2"></i>
+                            <span>devsolutions@novistech.com</span>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- JavaScript for frontend functionality -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Toggle sidebar collapse
+            const toggleSidebar = document.getElementById('toggleSidebar');
+            const sidebar = document.querySelector('.sidebar');
+            const mainContent = document.querySelector('.main-content');
+            
+            toggleSidebar.addEventListener('click', function() {
+                sidebar.classList.toggle('collapsed');
+                mainContent.classList.toggle('expanded');
+            });
+            
+            // Navigation handling
+            const navItems = document.querySelectorAll('.nav-item');
+            const sections = document.querySelectorAll('.section');
+            const pageTitle = document.getElementById('pageTitle');
+            
+            navItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Remove active class from all items
+                    navItems.forEach(navItem => navItem.classList.remove('active'));
+                    sections.forEach(section => section.classList.remove('active'));
+                    
+                    // Add active class to clicked item
+                    this.classList.add('active');
+                    
+                    // Show corresponding section
+                    const targetId = this.getAttribute('href').substring(1);
+                    const targetSection = document.getElementById(targetId);
+                    targetSection.classList.add('active');
+                    
+                    // Update page title
+                    pageTitle.textContent = this.querySelector('.nav-label').textContent;
+                    
+                    // Load content via AJAX (to be replaced with Django template rendering)
+                    loadSectionContent(targetId);
+                });
+            });
+            
+            // Function to load section content
+            function loadSectionContent(sectionId) {
+                const section = document.getElementById(sectionId);
+                const contentArea = section.querySelector('.content');
+                const loader = section.querySelector('.loader');
+                
+                // Show loading state
+                section.classList.add('loading');
+                
+                // Clear previous content
+                contentArea.innerHTML = '';
+                
+                // Simulate API call delay
+                setTimeout(() => {
+                    // Load appropriate content based on section
+                    switch(sectionId) {
+                        case 'dashboard':
+                            loadDashboardContent(contentArea);
+                            break;
+                        case 'data':
+                            loadDataWorkspaceContent(contentArea);
+                            break;
+                        case 'files':
+                            loadFileManagerContent(contentArea);
+                            break;
+                        case 'notes':
+                            loadResearchJournalContent(contentArea);
+                            break;
+                        case 'tasks':
+                            loadTaskManagerContent(contentArea);
+                            break;
+                        case 'search':
+                            loadResearchSearchContent(contentArea);
+                            break;
+                        case 'collab':
+                            loadCollaborationContent(contentArea);
+                            break;
+                        case 'settings':
+                            loadSettingsContent(contentArea);
+                            break;
+                    }
+                    
+                    // Remove loading state after content is loaded
+                    setTimeout(() => {
+                        section.classList.remove('loading');
+                    }, 300);
+                }, 800);
+            }
+            
+            // Content loading functions (to be replaced with Django templates)
+            function loadDashboardContent(container) {
+                container.innerHTML = `
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <div class="flex items-center">
+                                <div class="p-3 rounded-lg bg-blue-100 text-blue-600">
+                                    <i class="fas fa-file-alt text-xl"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <h3 class="text-sm font-medium text-gray-500">Research Files</h3>
+                                    <p class="text-2xl font-bold" id="fileCount">12</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <div class="flex items-center">
+                                <div class="p-3 rounded-lg bg-green-100 text-green-600">
+                                    <i class="fas fa-tasks text-xl"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <h3 class="text-sm font-medium text-gray-500">Pending Tasks</h3>
+                                    <p class="text-2xl font-bold" id="pendingTasks">5</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <div class="flex items-center">
+                                <div class="p-3 rounded-lg bg-purple-100 text-purple-600">
+                                    <i class="fas fa-sticky-note text-xl"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <h3 class="text-sm font-medium text-gray-500">Research Notes</h3>
+                                    <p class="text-2xl font-bold" id="notesCount">8</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <div class="flex items-center">
+                                <div class="p-3 rounded-lg bg-yellow-100 text-yellow-600">
+                                    <i class="fas fa-database text-xl"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <h3 class="text-sm font-medium text-gray-500">Data Points</h3>
+                                    <p class="text-2xl font-bold" id="dataPoints">1,247</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div class="bg-white rounded-lg shadow overflow-hidden">
+                            <div class="px-6 py-4 border-b">
+                                <h3 class="text-lg font-medium text-gray-800">Recent Notes</h3>
+                            </div>
+                            <div class="p-6" id="recentNotes">
+                                <div class="border-b pb-4 mb-4">
+                                    <h4 class="font-medium">Literature Review Findings</h4>
+                                    <p class="text-sm text-gray-600">Updated 2 hours ago</p>
+                                </div>
+                                <div class="border-b pb-4 mb-4">
+                                    <h4 class="font-medium">Methodology Considerations</h4>
+                                    <p class="text-sm text-gray-600">Updated yesterday</p>
+                                </div>
+                                <div>
+                                    <h4 class="font-medium">Conference Notes - ICRA 2023</h4>
+                                    <p class="text-sm text-gray-600">Updated 3 days ago</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-lg shadow overflow-hidden">
+                            <div class="px-6 py-4 border-b">
+                                <h3 class="text-lg font-medium text-gray-800">Upcoming Tasks</h3>
+                            </div>
+                            <div class="p-6" id="upcomingTasks">
+                                <div class="flex items-center justify-between border-b pb-4 mb-4">
+                                    <div>
+                                        <h4 class="font-medium">Complete data analysis</h4>
+                                        <p class="text-sm text-gray-600">Due tomorrow</p>
+                                    </div>
+                                    <button class="text-blue-600 hover:text-blue-800">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                </div>
+                                <div class="flex items-center justify-between border-b pb-4 mb-4">
+                                    <div>
+                                        <h4 class="font-medium">Prepare research paper draft</h4>
+                                        <p class="text-sm text-gray-600">Due in 3 days</p>
+                                    </div>
+                                    <button class="text-blue-600 hover:text-blue-800">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <h4 class="font-medium">Review collaborator feedback</h4>
+                                        <p class="text-sm text-gray-600">Due in 5 days</p>
+                                    </div>
+                                    <button class="text-blue-600 hover:text-blue-800">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            function loadDataWorkspaceContent(container) {
+                container.innerHTML = `
+                    <div class="bg-white rounded-lg shadow mb-6">
+                        <div class="px-6 py-4 border-b flex justify-between items-center">
+                            <h3 class="text-lg font-medium text-gray-800">Data Analysis Workspace</h3>
+                            <div class="flex space-x-2">
+                                <button class="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg text-sm font-medium hover:bg-blue-200">
+                                    <i class="fas fa-plus mr-2"></i>Add Column
+                                </button>
+                                <button class="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg text-sm font-medium hover:bg-blue-200">
+                                    <i class="fas fa-plus mr-2"></i>Add Row
+                                </button>
+                                <div class="relative">
+                                    <button class="px-4 py-2 bg-green-100 text-green-700 rounded-lg text-sm font-medium hover:bg-green-200">
+                                        <i class="fas fa-calculator mr-2"></i>Analyze Data
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-6 overflow-auto">
+                            <div class="text-center py-10 text-gray-500">
+                                <i class="fas fa-table fa-3x mb-4"></i>
+                                <p>No data loaded. Import data to begin analysis.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow">
+                        <div class="px-6 py-4 border-b">
+                            <h3 class="text-lg font-medium text-gray-800">Quick Analysis Tools</h3>
+                        </div>
+                        <div class="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <button class="p-4 bg-blue-50 rounded-lg text-center hover:bg-blue-100">
+                                <i class="fas fa-chart-bar text-blue-600 text-2xl mb-2"></i>
+                                <h4 class="font-medium">Descriptive Stats</h4>
+                                <p class="text-sm text-gray-600">Mean, median, mode, etc.</p>
+                            </button>
+                            <button class="p-4 bg-green-50 rounded-lg text-center hover:bg-green-100">
+                                <i class="fas fa-project-diagram text-green-600 text-2xl mb-2"></i>
+                                <h4 class="font-medium">Correlation</h4>
+                                <p class="text-sm text-gray-600">Find relationships between variables</p>
+                            </button>
+                            <button class="p-4 bg-purple-50 rounded-lg text-center hover:bg-purple-100">
+                                <i class="fas fa-chart-line text-purple-600 text-2xl mb-2"></i>
+                                <h4 class="font-medium">Regression</h4>
+                                <p class="text-sm text-gray-600">Predictive modeling</p>
+                            </button>
+                            <button class="p-4 bg-yellow-50 rounded-lg text-center hover:bg-yellow-100">
+                                <i class="fas fa-balance-scale text-yellow-600 text-2xl mb-2"></i>
+                                <h4 class="font-medium">T-Test</h4>
+                                <p class="text-sm text-gray-600">Compare means between groups</p>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            function loadFileManagerContent(container) {
+                container.innerHTML = `
+                    <div class="bg-white rounded-lg shadow mb-6">
+                        <div class="px-6 py-4 border-b flex justify-between items-center">
+                            <h3 class="text-lg font-medium text-gray-800">Research Files</h3>
+                            <button class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700">
+                                <i class="fas fa-upload mr-2"></i>Upload Files
+                            </button>
+                        </div>
+                        <div class="p-6">
+                            <div class="text-center py-10 text-gray-500">
+                                <i class="fas fa-folder-open fa-3x mb-4"></i>
+                                <p>No files uploaded yet. Upload your research files to get started.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow">
+                        <div class="px-6 py-4 border-b">
+                            <h3 class="text-lg font-medium text-gray-800">File Activity</h3>
+                        </div>
+                        <div class="p-6">
+                            <p class="text-gray-500 text-center py-4">No recent file activity</p>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Additional content loading functions would be defined here
+            function loadResearchJournalContent(container) {
+                container.innerHTML = `
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div class="lg:col-span-2">
+                            <div class="bg-white rounded-lg shadow mb-6">
+                                <div class="px-6 py-4 border-b">
+                                    <h3 class="text-lg font-medium text-gray-800">Research Notes</h3>
+                                </div>
+                                <div class="p-6">
+                                    <p class="text-gray-500 text-center py-10">No notes yet. Create your first research note to get started.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="bg-white rounded-lg shadow sticky top-6">
+                                <div class="px-6 py-4 border-b">
+                                    <h3 class="text-lg font-medium text-gray-800">Add New Note</h3>
+                                </div>
+                                <div class="p-6">
+                                    <div class="mb-4">
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                                        <input 
+                                            type="text" 
+                                            class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            placeholder="Note title"
+                                        />
+                                    </div>
+                                    <div class="mb-4">
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Content</label>
+                                        <textarea 
+                                            rows="5"
+                                            class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            placeholder="Write your research notes here..."
+                                        ></textarea>
+                                    </div>
+                                    <button class="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                                        Save Note
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            function loadTaskManagerContent(container) {
+                container.innerHTML = `
+                    <div class="bg-white rounded-lg shadow mb-6">
+                        <div class="px-6 py-4 border-b">
+                            <h3 class="text-lg font-medium text-gray-800">Research Tasks</h3>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex mb-6">
+                                <input 
+                                    type="text" 
+                                    class="flex-1 px-4 py-2 border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="Add a new research task..."
+                                />
+                                <button class="px-6 bg-blue-600 text-white rounded-r-lg hover:bg-blue-700">
+                                    Add
+                                </button>
+                            </div>
+
+                            <div class="space-y-3" id="tasksContainer">
+                                <p class="text-gray-500 text-center py-4">No tasks yet. Add tasks to manage your research workflow.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow">
+                        <div class="px-6 py-4 border-b">
+                            <h3 class="text-lg font-medium text-gray-800">Task Statistics</h3>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex items-center justify-between mb-6">
+                                <div>
+                                    <h4 class="text-sm font-medium text-gray-600">Total Tasks</h4>
+                                    <p class="text-2xl font-bold">0</p>
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-medium text-gray-600">Completed</h4>
+                                    <p class="text-2xl font-bold text-green-600">0</p>
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-medium text-gray-600">Pending</h4>
+                                    <p class="text-2xl font-bold text-yellow-600">0</p>
+                                </div>
+                            </div>
+
+                            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                <div class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div>
+                            </div>
+                            <p class="text-sm text-gray-600 mt-2">0% of tasks completed</p>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Additional section content functions would follow the same pattern
+            
+            // Initialize the dashboard content
+            loadSectionContent('dashboard');
+        });
+    </script>
+</body>
+</html>
