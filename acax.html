@@ -1,0 +1,2031 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maritime System - Academic Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #1a237e;
+            --secondary: #283593;
+            --accent: #3949ab;
+            --light: #e8eaf6;
+            --dark: #0d1238;
+            --sidebar-width: 250px;
+            --sidebar-collapsed: 70px;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            overflow-x: hidden;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            background-color: var(--primary);
+            color: white;
+            height: 100vh;
+            position: fixed;
+            padding-top: 60px;
+            width: var(--sidebar-width);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed);
+        }
+        
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 12px 20px;
+            margin: 4px 0;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+        
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        .sidebar .nav-link i {
+            margin-right: 10px;
+            width: 24px;
+            text-align: center;
+            transition: margin-right 0.3s;
+        }
+        
+        .sidebar.collapsed .nav-link span {
+            display: none;
+        }
+        
+        .sidebar.collapsed .nav-link i {
+            margin-right: 0;
+        }
+        
+        /* Topbar Styles */
+        .topbar {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            height: 60px;
+            position: fixed;
+            width: 100%;
+            z-index: 999;
+            padding: 0 20px;
+        }
+        
+        /* Main Content */
+        .main-content {
+            padding-top: 80px;
+            padding-left: calc(var(--sidebar-width) + 20px);
+            padding-right: 20px;
+            padding-bottom: 40px;
+            transition: all 0.3s ease;
+        }
+        
+        .main-content.expanded {
+            padding-left: calc(var(--sidebar-collapsed) + 20px);
+        }
+        
+        /* Card Styles */
+        .card {
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+            border: none;
+        }
+        
+        .card-header {
+            background-color: white;
+            border-bottom: 1px solid #e0e0e0;
+            font-weight: 600;
+            padding: 15px 20px;
+        }
+        
+        /* Stats Card */
+        .stats-card {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .stats-card i {
+            font-size: 2rem;
+            color: var(--accent);
+            margin-bottom: 15px;
+        }
+        
+        .stats-card h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+        
+        .stats-card p {
+            color: #666;
+            margin-bottom: 0;
+        }
+        
+        /* Buttons */
+        .btn-primary {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary);
+            border-color: var(--secondary);
+        }
+        
+        /* Table Styles */
+        .table th {
+            background-color: var(--light);
+            font-weight: 600;
+        }
+        
+        /* Module Section */
+        .module-section {
+            margin-bottom: 30px;
+        }
+        
+        .module-title {
+            border-bottom: 2px solid var(--light);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            color: var(--dark);
+        }
+        
+        /* Page Content */
+        .page-content {
+            display: none;
+        }
+        
+        .page-content.active {
+            display: block;
+        }
+        
+        /* Mobile Responsiveness */
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: var(--sidebar-width);
+            }
+            
+            .sidebar.mobile-expanded {
+                transform: translateX(0);
+            }
+            
+            .sidebar .nav-link span {
+                display: inline;
+            }
+            
+            .sidebar .nav-link i {
+                margin-right: 10px;
+            }
+            
+            .main-content {
+                padding-left: 20px;
+            }
+            
+            .overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 999;
+            }
+            
+            .overlay.active {
+                display: block;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                padding-left: 15px;
+                padding-right: 15px;
+            }
+            
+            .topbar {
+                padding: 0 10px;
+            }
+            
+            .stats-card h2 {
+                font-size: 1.5rem;
+            }
+            
+            .btn-responsive {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+        }
+        
+        /* Toggle Button */
+        .sidebar-toggle {
+            background: none;
+            border: none;
+            color: var(--dark);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        /* Form Styles */
+        .form-section {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        /* Results Table */
+        .results-table th {
+            position: sticky;
+            top: 0;
+            background-color: var(--light);
+            z-index: 10;
+        }
+        
+        /* Calendar Styles */
+        .calendar-day {
+            border: 1px solid #dee2e6;
+            height: 100px;
+            overflow-y: auto;
+        }
+        
+        .calendar-event {
+            font-size: 0.8rem;
+            padding: 2px 5px;
+            margin-bottom: 2px;
+            border-radius: 3px;
+            background-color: var(--light);
+        }
+        
+        /* Notice Board */
+        .notice-card {
+            border-left: 4px solid var(--accent);
+            margin-bottom: 15px;
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+    </style>
+</head>
+<body>
+    <!-- Overlay for mobile -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Top Navigation Bar -->
+    <nav class="topbar navbar navbar-expand d-flex align-items-center">
+        <button class="sidebar-toggle me-3" id="sidebarToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+        <a class="navbar-brand fw-bold text-dark" href="#">
+            <i class="fas fa-graduation-cap me-2 text-primary"></i>Maritime System
+        </a>
+        <ul class="navbar-nav ms-auto">
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                    <i class="fas fa-user-circle me-1"></i> Academic Master
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Profile</a></li>
+                    <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Settings</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="#"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Sidebar Navigation -->
+    <div class="sidebar" id="sidebar">
+        <div class="position-sticky">
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#" data-page="dashboard">
+                        <i class="fas fa-tachometer-alt"></i> <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" data-page="students">
+                        <i class="fas fa-user-graduate"></i> <span>Students</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" data-page="teachers">
+                        <i class="fas fa-chalkboard-teacher"></i> <span>Teachers</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" data-page="classes">
+                        <i class="fas fa-school"></i> <span>Classes</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" data-page="subjects">
+                        <i class="fas fa-book"></i> <span>Subjects</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" data-page="calendar">
+                        <i class="fas fa-calendar-alt"></i> <span>Calendar</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" data-page="results">
+                        <i class="fas fa-clipboard-list"></i> <span>Results</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" data-page="reports">
+                        <i class="fas fa-chart-bar"></i> <span>Reports</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" data-page="parents">
+                        <i class="fas fa-users"></i> <span>Parents</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" data-page="notices">
+                        <i class="fas fa-bullhorn"></i> <span>Notices</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" data-page="settings">
+                        <i class="fas fa-cogs"></i> <span>Settings</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+        <!-- Dashboard Page -->
+        <div class="page-content active" id="dashboard">
+            <div class="container-fluid">
+                <!-- Dashboard Header -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h1 class="h3 mb-0 text-gray-800">Academic Master Dashboard</h1>
+                    <div>
+                        <button class="btn btn-primary"><i class="fas fa-sync-alt me-1"></i> Refresh Data</button>
+                    </div>
+                </div>
+
+                <!-- Stats Overview -->
+                <div class="row">
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card stats-card">
+                            <i class="fas fa-user-graduate"></i>
+                            <h2>1,248</h2>
+                            <p>Total Students</p>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card stats-card">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                            <h2>64</h2>
+                            <p>Teaching Staff</p>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card stats-card">
+                            <i class="fas fa-school"></i>
+                            <h2>24</h2>
+                            <p>Active Classes</p>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card stats-card">
+                            <i class="fas fa-book"></i>
+                            <h2>32</h2>
+                            <p>Subjects</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Student Performance Chart -->
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Class Performance Overview</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="performanceChart" height="250"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Recent Announcements</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-info p-2 mb-2">
+                                    <small><strong>Term 1 Examinations</strong> - Starting next week</small>
+                                </div>
+                                <div class="alert alert-warning p-2 mb-2">
+                                    <small><strong>Staff Meeting</strong> - Friday at 10:00 AM</small>
+                                </div>
+                                <div class="alert alert-success p-2 mb-2">
+                                    <small><strong>Parent-Teacher Conference</strong> - Schedule released</small>
+                                </div>
+                                <div class="alert alert-primary p-2">
+                                    <small><strong>New Curriculum Materials</strong> - Available for download</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activities -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0">Recent Student Activities</h5>
+                                <div>
+                                    <select class="form-select form-select-sm">
+                                        <option>All Classes</option>
+                                        <option>Form 1</option>
+                                        <option>Form 2</option>
+                                        <option>Form 3</option>
+                                        <option>Form 4</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Student</th>
+                                                <th>Class</th>
+                                                <th>Activity</th>
+                                                <th>Date</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>John Doe (S001)</td>
+                                                <td>Form 3A</td>
+                                                <td>Mathematics Assignment Submission</td>
+                                                <td>12 Oct 2023</td>
+                                                <td><span class="badge bg-success">Submitted</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Jane Smith (S045)</td>
+                                                <td>Form 2B</td>
+                                                <td>Science Quiz Result</td>
+                                                <td>11 Oct 2023</td>
+                                                <td><span class="badge bg-warning">Pending</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Michael Johnson (S123)</td>
+                                                <td>Form 4C</td>
+                                                <td>English Essay Submission</td>
+                                                <td>10 Oct 2023</td>
+                                                <td><span class="badge bg-success">Graded</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Sarah Williams (S087)</td>
+                                                <td>Form 1A</td>
+                                                <td>History Project Upload</td>
+                                                <td>9 Oct 2023</td>
+                                                <td><span class="badge bg-danger">Missing</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Robert Brown (S156)</td>
+                                                <td>Form 3B</td>
+                                                <td>Physics Test Result</td>
+                                                <td>8 Oct 2023</td>
+                                                <td><span class="badge bg-info">Reviewed</span></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Upcoming Events -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Upcoming Academic Events</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card bg-light">
+                                            <div class="card-body text-center">
+                                                <h5 class="card-title">Term 1 Exams</h5>
+                                                <p class="card-text">15-20 Oct 2023</p>
+                                                <span class="badge bg-primary">All Classes</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card bg-light">
+                                            <div class="card-body text-center">
+                                                <h5 class="card-title">Staff Meeting</h5>
+                                                <p class="card-text">22 Oct 2023</p>
+                                                <span class="badge bg-info">Teachers</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card bg-light">
+                                            <div class="card-body text-center">
+                                                <h5 class="card-title">Parent Day</h5>
+                                                <p class="card-text">28 Oct 2023</p>
+                                                <span class="badge bg-success">All</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card bg-light">
+                                            <div class="card-body text-center">
+                                                <h5 class="card-title">Sports Day</h5>
+                                                <p class="card-text">5 Nov 2023</p>
+                                                <span class="badge bg-warning">Students</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Student Management Page -->
+        <div class="page-content" id="students">
+            <div class="container-fluid">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h1 class="h3 mb-0 text-gray-800">Student Management</h1>
+                    <button class="btn btn-primary"><i class="fas fa-plus me-1"></i> Add New Student</button>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Student Filters</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label class="form-label">Class</label>
+                                    <select class="form-select">
+                                        <option>All Classes</option>
+                                        <option>Form 1</option>
+                                        <option>Form 2</option>
+                                        <option>Form 3</option>
+                                        <option>Form 4</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Stream</label>
+                                    <select class="form-select">
+                                        <option>All Streams</option>
+                                        <option>A</option>
+                                        <option>B</option>
+                                        <option>C</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Department</label>
+                                    <select class="form-select">
+                                        <option>All Departments</option>
+                                        <option>Sciences</option>
+                                        <option>Humanities</option>
+                                        <option>Business</option>
+                                    </select>
+                                </div>
+                                <button class="btn btn-primary w-100">Apply Filters</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0">Student List</h5>
+                                <div class="input-group" style="max-width: 250px;">
+                                    <input type="text" class="form-control form-control-sm" placeholder="Search students...">
+                                    <button class="btn btn-sm btn-outline-secondary" type="button"><i class="fas fa-search"></i></button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Reg No.</th>
+                                                <th>Name</th>
+                                                <th>Class</th>
+                                                <th>Stream</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>S001</td>
+                                                <td>John Doe</td>
+                                                <td>Form 3</td>
+                                                <td>A</td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></button>
+                                                    <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-edit"></i></button>
+                                                    <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>S045</td>
+                                                <td>Jane Smith</td>
+                                                <td>Form 2</td>
+                                                <td>B</td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></button>
+                                                    <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-edit"></i></button>
+                                                    <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>S123</td>
+                                                <td>Michael Johnson</td>
+                                                <td>Form 4</td>
+                                                <td>C</td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></button>
+                                                    <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-edit"></i></button>
+                                                    <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>S087</td>
+                                                <td>Sarah Williams</td>
+                                                <td>Form 1</td>
+                                                <td>A</td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></button>
+                                                    <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-edit"></i></button>
+                                                    <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>S156</td>
+                                                <td>Robert Brown</td>
+                                                <td>Form 3</td>
+                                                <td>B</td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></button>
+                                                    <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-edit"></i></button>
+                                                    <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <nav aria-label="Page navigation">
+                                    <ul class="pagination justify-content-center">
+                                        <li class="page-item disabled">
+                                            <a class="page-link" href="#">Previous</a>
+                                        </li>
+                                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                        <li class="page-item">
+                                            <a class="page-link" href="#">Next</a>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Teacher Management Page -->
+        <div class="page-content" id="teachers">
+            <div class="container-fluid">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h1 class="h3 mb-0 text-gray-800">Teacher Management</h1>
+                    <button class="btn btn-primary"><i class="fas fa-plus me-1"></i> Add New Teacher</button>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0">Teaching Staff</h5>
+                                <div class="input-group" style="max-width: 250px;">
+                                    <input type="text" class="form-control form-control-sm" placeholder="Search teachers...">
+                                    <button class="btn btn-sm btn-outline-secondary" type="button"><i class="fas fa-search"></i></button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Name</th>
+                                                <th>Subject</th>
+                                                <th>Department</th>
+                                                <th>Classes</th>
+                                                <th>Status</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>T001</td>
+                                                <td>Dr. James Wilson</td>
+                                                <td>Mathematics</td>
+                                                <td>Sciences</td>
+                                                <td>Form 3A, Form 4B</td>
+                                                <td><span class="badge bg-success">Active</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></button>
+                                                    <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-edit"></i></button>
+                                                    <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>T012</td>
+                                                <td>Prof. Susan Lee</td>
+                                                <td>English Literature</td>
+                                                <td>Humanities</td>
+                                                <td>Form 2A, Form 3C</td>
+                                                <td><span class="badge bg-success">Active</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></button>
+                                                    <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-edit"></i></button>
+                                                    <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>T023</td>
+                                                <td>Dr. Robert Kim</td>
+                                                <td>Physics</td>
+                                                <td>Sciences</td>
+                                                <td>Form 4A, Form 4C</td>
+                                                <td><span class="badge bg-success">Active</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></button>
+                                                    <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-edit"></i></button>
+                                                    <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>T034</td>
+                                                <td>Ms. Emily Chen</td>
+                                                <td>Business Studies</td>
+                                                <td>Business</td>
+                                                <td>Form 1B, Form 2C</td>
+                                                <td><span class="badge bg-success">Active</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></button>
+                                                    <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-edit"></i></button>
+                                                    <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Class & Stream Management Page -->
+        <div class="page-content" id="classes">
+            <div class="container-fluid">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h1 class="h3 mb-0 text-gray-800">Class & Stream Management</h1>
+                    <div>
+                        <button class="btn btn-primary me-2"><i class="fas fa-plus me-1"></i> Add Class</button>
+                        <button class="btn btn-primary"><i class="fas fa-plus me-1"></i> Add Stream</button>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Class List</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Class</th>
+                                                <th>Streams</th>
+                                                <th>Students</th>
+                                                <th>Class Teacher</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>Form 1</td>
+                                                <td>A, B, C</td>
+                                                <td>120</td>
+                                                <td>Mr. Johnson</td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></button>
+                                                    <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-edit"></i></button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Form 2</td>
+                                                <td>A, B, C</td>
+                                                <td>115</td>
+                                                <td>Ms. Williams</td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></button>
+                                                    <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-edit"></i></button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Form 3</td>
+                                                <td>A, B, C</td>
+                                                <td>130</td>
+                                                <td>Dr. Wilson</td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></button>
+                                                    <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-edit"></i></button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Form 4</td>
+                                                <td>A, B, C</td>
+                                                <td>125</td>
+                                                <td>Prof. Lee</td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></button>
+                                                    <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-edit"></i></button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Stream Details</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-4">
+                                    <h6>Form 3A Stream</h6>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Class Teacher:</span>
+                                        <strong>Dr. James Wilson</strong>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Number of Students:</span>
+                                        <strong>42</strong>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Subjects Offered:</span>
+                                        <strong>8</strong>
+                                    </div>
+                                </div>
+                                <div class="mb-4">
+                                    <h6>Form 3B Stream</h6>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Class Teacher:</span>
+                                        <strong>Ms. Emily Chen</strong>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Number of Students:</span>
+                                        <strong>38</strong>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Subjects Offered:</span>
+                                        <strong>7</strong>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h6>Form 3C Stream</h6>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Class Teacher:</span>
+                                        <strong>Mr. Robert Kim</strong>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Number of Students:</span>
+                                        <strong>45</strong>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Subjects Offered:</span>
+                                        <strong>9</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Subject & Department Management Page -->
+        <div class="page-content" id="subjects">
+            <div class="container-fluid">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h1 class="h3 mb-0 text-gray-800">Subject & Department Management</h1>
+                    <div>
+                        <button class="btn btn-primary me-2"><i class="fas fa-plus me-1"></i> Add Subject</button>
+                        <button class="btn btn-primary"><i class="fas fa-plus me-1"></i> Add Department</button>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Departments</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="list-group">
+                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-0">Sciences Department</h6>
+                                            <small class="text-muted">Head: Dr. James Wilson</small>
+                                        </div>
+                                        <span class="badge bg-primary rounded-pill">8 Subjects</span>
+                                    </div>
+                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-0">Humanities Department</h6>
+                                            <small class="text-muted">Head: Prof. Susan Lee</small>
+                                        </div>
+                                        <span class="badge bg-primary rounded-pill">6 Subjects</span>
+                                    </div>
+                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-0">Business Department</h6>
+                                            <small class="text-muted">Head: Ms. Emily Chen</small>
+                                        </div>
+                                        <span class="badge bg-primary rounded-pill">5 Subjects</span>
+                                    </div>
+                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-0">Languages Department</h6>
+                                            <small class="text-muted">Head: Mr. Robert Kim</small>
+                                        </div>
+                                        <span class="badge bg-primary rounded-pill">4 Subjects</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Subject List</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Subject</th>
+                                                <th>Department</th>
+                                                <th>Teachers</th>
+                                                <th>Classes</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>Mathematics</td>
+                                                <td>Sciences</td>
+                                                <td>3</td>
+                                                <td>All Forms</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Physics</td>
+                                                <td>Sciences</td>
+                                                <td>2</td>
+                                                <td>Form 3-4</td>
+                                            </tr>
+                                            <tr>
+                                                <td>English Literature</td>
+                                                <td>Humanities</td>
+                                                <td>4</td>
+                                                <td>All Forms</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Business Studies</td>
+                                                <td>Business</td>
+                                                <td>2</td>
+                                                <td>Form 2-4</td>
+                                            </tr>
+                                            <tr>
+                                                <td>History</td>
+                                                <td>Humanities</td>
+                                                <td>3</td>
+                                                <td>Form 1-4</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Academic Calendar Page -->
+        <div class="page-content" id="calendar">
+            <div class="container-fluid">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h1 class="h3 mb-0 text-gray-800">Academic Calendar</h1>
+                    <button class="btn btn-primary"><i class="fas fa-plus me-1"></i> Add Event</button>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Term Dates</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <h6>Term 1 2023/2024</h6>
+                                    <p class="mb-0">Start: 5th September 2023</p>
+                                    <p class="mb-0">End: 15th December 2023</p>
+                                </div>
+                                <div class="mb-3">
+                                    <h6>Term 2 2023/2024</h6>
+                                    <p class="mb-0">Start: 8th January 2024</p>
+                                    <p class="mb-0">End: 4th April 2024</p>
+                                </div>
+                                <div>
+                                    <h6>Term 3 2023/2024</h6>
+                                    <p class="mb-0">Start: 29th April 2024</p>
+                                    <p class="mb-0">End: 26th July 2024</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card mt-4">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Filters</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label class="form-label">View By</label>
+                                    <select class="form-select">
+                                        <option>All Events</option>
+                                        <option>Examinations</option>
+                                        <option>Holidays</option>
+                                        <option>Meetings</option>
+                                        <option>School Events</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Class</label>
+                                    <select class="form-select">
+                                        <option>All Classes</option>
+                                        <option>Form 1</option>
+                                        <option>Form 2</option>
+                                        <option>Form 3</option>
+                                        <option>Form 4</option>
+                                    </select>
+                                </div>
+                                <button class="btn btn-primary w-100">Apply Filters</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-9">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">October 2023</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Sun</th>
+                                                <th>Mon</th>
+                                                <th>Tue</th>
+                                                <th>Wed</th>
+                                                <th>Thu</th>
+                                                <th>Fri</th>
+                                                <th>Sat</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td class="calendar-day"></td>
+                                                <td class="calendar-day"></td>
+                                                <td class="calendar-day"></td>
+                                                <td class="calendar-day"></td>
+                                                <td class="calendar-day"></td>
+                                                <td class="calendar-day"></td>
+                                                <td class="calendar-day">1</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="calendar-day">2</td>
+                                                <td class="calendar-day">3</td>
+                                                <td class="calendar-day">4</td>
+                                                <td class="calendar-day">5</td>
+                                                <td class="calendar-day">6</td>
+                                                <td class="calendar-day">7</td>
+                                                <td class="calendar-day">8</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="calendar-day">9</td>
+                                                <td class="calendar-day">10</td>
+                                                <td class="calendar-day">11</td>
+                                                <td class="calendar-day">12</td>
+                                                <td class="calendar-day">13</td>
+                                                <td class="calendar-day">14</td>
+                                                <td class="calendar-day">15</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="calendar-day">16</td>
+                                                <td class="calendar-day">
+                                                    17
+                                                    <div class="calendar-event bg-info">Math Quiz - Form 3</div>
+                                                </td>
+                                                <td class="calendar-day">18</td>
+                                                <td class="calendar-day">
+                                                    19
+                                                    <div class="calendar-event bg-warning">Staff Meeting</div>
+                                                </td>
+                                                <td class="calendar-day">20</td>
+                                                <td class="calendar-day">21</td>
+                                                <td class="calendar-day">22</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="calendar-day">23</td>
+                                                <td class="calendar-day">24</td>
+                                                <td class="calendar-day">
+                                                    25
+                                                    <div class="calendar-event bg-danger">Parent-Teacher Conference</div>
+                                                </td>
+                                                <td class="calendar-day">26</td>
+                                                <td class="calendar-day">27</td>
+                                                <td class="calendar-day">28</td>
+                                                <td class="calendar-day">29</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="calendar-day">30</td>
+                                                <td class="calendar-day">31</td>
+                                                <td class="calendar-day"></td>
+                                                <td class="calendar-day"></td>
+                                                <td class="calendar-day"></td>
+                                                <td class="calendar-day"></td>
+                                                <td class="calendar-day"></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results & Workspace Page -->
+        <div class="page-content" id="results">
+            <div class="container-fluid">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h1 class="h3 mb-0 text-gray-800">Results & Workspace</h1>
+                    <div>
+                        <button class="btn btn-primary me-2"><i class="fas fa-upload me-1"></i> Import Results</button>
+                        <button class="btn btn-primary"><i class="fas fa-download me-1"></i> Export Results</button>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Result Filters</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label class="form-label">Term</label>
+                                    <select class="form-select">
+                                        <option>Term 1 2023/2024</option>
+                                        <option>Term 2 2023/2024</option>
+                                        <option>Term 3 2023/2024</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Class</label>
+                                    <select class="form-select">
+                                        <option>Form 1</option>
+                                        <option>Form 2</option>
+                                        <option>Form 3</option>
+                                        <option>Form 4</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Stream</label>
+                                    <select class="form-select">
+                                        <option>A</option>
+                                        <option>B</option>
+                                        <option>C</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Subject</label>
+                                    <select class="form-select">
+                                        <option>Mathematics</option>
+                                        <option>English</option>
+                                        <option>Physics</option>
+                                        <option>Chemistry</option>
+                                        <option>Biology</option>
+                                        <option>History</option>
+                                    </select>
+                                </div>
+                                <button class="btn btn-primary w-100">Load Results</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-9">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0">Form 3A - Mathematics Results (Term 1 2023/2024)</h5>
+                                <div>
+                                    <button class="btn btn-sm btn-success me-1"><i class="fas fa-check me-1"></i> Approve</button>
+                                    <button class="btn btn-sm btn-warning me-1"><i class="fas fa-undo me-1"></i> Return</button>
+                                    <button class="btn btn-sm btn-primary"><i class="fas fa-print me-1"></i> Print</button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-hover results-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Reg No.</th>
+                                                <th>Student Name</th>
+                                                <th>CAT 1 (30)</th>
+                                                <th>CAT 2 (30)</th>
+                                                <th>Main Exam (70)</th>
+                                                <th>Total (100)</th>
+                                                <th>Grade</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>S001</td>
+                                                <td>John Doe</td>
+                                                <td>25</td>
+                                                <td>28</td>
+                                                <td>65</td>
+                                                <td>90</td>
+                                                <td>A</td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-edit"></i></button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>S045</td>
+                                                <td>Jane Smith</td>
+                                                <td>22</td>
+                                                <td>24</td>
+                                                <td>60</td>
+                                                <td>82</td>
+                                                <td>A-</td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-edit"></i></button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>S123</td>
+                                                <td>Michael Johnson</td>
+                                                <td>18</td>
+                                                <td>20</td>
+                                                <td>55</td>
+                                                <td>73</td>
+                                                <td>B</td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-edit"></i></button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>S087</td>
+                                                <td>Sarah Williams</td>
+                                                <td>28</td>
+                                                <td>27</td>
+                                                <td>68</td>
+                                                <td>95</td>
+                                                <td>A</td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-edit"></i></button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>S156</td>
+                                                <td>Robert Brown</td>
+                                                <td>15</td>
+                                                <td>17</td>
+                                                <td>48</td>
+                                                <td>65</td>
+                                                <td>C+</td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-edit"></i></button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center mt-3">
+                                    <div>
+                                        <button class="btn btn-outline-primary me-2"><i class="fas fa-save me-1"></i> Save Changes</button>
+                                        <button class="btn btn-outline-secondary"><i class="fas fa-redo me-1"></i> Reset</button>
+                                    </div>
+                                    <div>
+                                        <button class="btn btn-primary"><i class="fas fa-chart-line me-1"></i> Generate Summary</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reports & Analytics Page -->
+        <div class="page-content" id="reports">
+            <div class="container-fluid">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h1 class="h3 mb-0 text-gray-800">Reports & Analytics</h1>
+                    <button class="btn btn-primary"><i class="fas fa-download me-1"></i> Export Report</button>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Report Generator</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label class="form-label">Report Type</label>
+                                    <select class="form-select">
+                                        <option>Student Report</option>
+                                        <option>Class Report</option>
+                                        <option>Stream Report</option>
+                                        <option>Subject Report</option>
+                                        <option>Term Report</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Term</label>
+                                    <select class="form-select">
+                                        <option>Term 1 2023/2024</option>
+                                        <option>Term 2 2023/2024</option>
+                                        <option>Term 3 2023/2024</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Class</label>
+                                    <select class="form-select">
+                                        <option>Form 1</option>
+                                        <option>Form 2</option>
+                                        <option>Form 3</option>
+                                        <option>Form 4</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Stream</label>
+                                    <select class="form-select">
+                                        <option>A</option>
+                                        <option>B</option>
+                                        <option>C</option>
+                                    </select>
+                                </div>
+                                <button class="btn btn-primary w-100">Generate Report</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Form 3A Performance Report - Term 1 2023/2024</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="classPerformanceChart" height="200"></canvas>
+                            </div>
+                        </div>
+                        <div class="card mt-4">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Student Ranking</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Rank</th>
+                                                <th>Reg No.</th>
+                                                <th>Student Name</th>
+                                                <th>Total</th>
+                                                <th>Average</th>
+                                                <th>Grade</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>1</td>
+                                                <td>S087</td>
+                                                <td>Sarah Williams</td>
+                                                <td>845</td>
+                                                <td>84.5</td>
+                                                <td>A</td>
+                                            </tr>
+                                            <tr>
+                                                <td>2</td>
+                                                <td>S001</td>
+                                                <td>John Doe</td>
+                                                <td>832</td>
+                                                <td>83.2</td>
+                                                <td>A</td>
+                                            </tr>
+                                            <tr>
+                                                <td>3</td>
+                                                <td>S045</td>
+                                                <td>Jane Smith</td>
+                                                <td>798</td>
+                                                <td>79.8</td>
+                                                <td>A-</td>
+                                            </tr>
+                                            <tr>
+                                                <td>4</td>
+                                                <td>S123</td>
+                                                <td>Michael Johnson</td>
+                                                <td>765</td>
+                                                <td>76.5</td>
+                                                <td>B+</td>
+                                            </tr>
+                                            <tr>
+                                                <td>5</td>
+                                                <td>S156</td>
+                                                <td>Robert Brown</td>
+                                                <td>689</td>
+                                                <td>68.9</td>
+                                                <td>B-</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Parent Management Page -->
+        <div class="page-content" id="parents">
+            <div class="container-fluid">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h1 class="h3 mb-0 text-gray-800">Parent Management</h1>
+                    <button class="btn btn-primary"><i class="fas fa-plus me-1"></i> Add Parent</button>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0">Parent List</h5>
+                                <div class="input-group" style="max-width: 250px;">
+                                    <input type="text" class="form-control form-control-sm" placeholder="Search parents...">
+                                    <button class="btn btn-sm btn-outline-secondary" type="button"><i class="fas fa-search"></i></button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Parent ID</th>
+                                                <th>Name</th>
+                                                <th>Contact</th>
+                                                <th>Email</th>
+                                                <th>Students</th>
+                                                <th>Status</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>P001</td>
+                                                <td>Mr. & Mrs. Doe</td>
+                                                <td>+254 712 345 678</td>
+                                                <td>doe.family@email.com</td>
+                                                <td>John Doe (Form 3A)</td>
+                                                <td><span class="badge bg-success">Active</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></button>
+                                                    <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-edit"></i></button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>P045</td>
+                                                <td>Ms. Smith</td>
+                                                <td>+254 723 456 789</td>
+                                                <td>smith.jane@email.com</td>
+                                                <td>Jane Smith (Form 2B)</td>
+                                                <td><span class="badge bg-success">Active</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></button>
+                                                    <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-edit"></i></button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>P123</td>
+                                                <td>Dr. Johnson</td>
+                                                <td>+254 734 567 890</td>
+                                                <td>johnson.m@email.com</td>
+                                                <td>Michael Johnson (Form 4C)</td>
+                                                <td><span class="badge bg-success">Active</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></button>
+                                                    <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-edit"></i></button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>P087</td>
+                                                <td>Mr. Williams</td>
+                                                <td>+254 745 678 901</td>
+                                                <td>williams.s@email.com</td>
+                                                <td>Sarah Williams (Form 1A)</td>
+                                                <td><span class="badge bg-success">Active</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></button>
+                                                    <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-edit"></i></button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notice Board Page -->
+        <div class="page-content" id="notices">
+            <div class="container-fluid">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h1 class="h3 mb-0 text-gray-800">Notice Board & Announcements</h1>
+                    <button class="btn btn-primary"><i class="fas fa-plus me-1"></i> Post Notice</button>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Active Notices</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="notice-card card mb-3">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <h5 class="card-title mb-0">Term 1 Examinations Schedule</h5>
+                                            <span class="badge bg-primary">Important</span>
+                                        </div>
+                                        <p class="card-text">The examination schedule for Term 1 has been finalized. Please ensure all students are aware of the timetable.</p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <small class="text-muted">Posted on: October 5, 2023</small>
+                                            <div>
+                                                <button class="btn btn-sm btn-outline-secondary me-1"><i class="fas fa-edit"></i></button>
+                                                <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="notice-card card mb-3">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <h5 class="card-title mb-0">Parent-Teacher Meeting</h5>
+                                            <span class="badge bg-success">Event</span>
+                                        </div>
+                                        <p class="card-text">The annual parent-teacher meeting will be held on October 25, 2023. All parents are encouraged to attend.</p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <small class="text-muted">Posted on: October 3, 2023</small>
+                                            <div>
+                                                <button class="btn btn-sm btn-outline-secondary me-1"><i class="fas fa-edit"></i></button>
+                                                <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="notice-card card mb-3">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <h5 class="card-title mb-0">Staff Meeting Agenda</h5>
+                                            <span class="badge bg-info">Internal</span>
+                                        </div>
+                                        <p class="card-text">The next staff meeting will focus on curriculum review and examination preparation strategies.</p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <small class="text-muted">Posted on: October 1, 2023</small>
+                                            <div>
+                                                <button class="btn btn-sm btn-outline-secondary me-1"><i class="fas fa-edit"></i></button>
+                                                <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Post New Notice</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label class="form-label">Title</label>
+                                    <input type="text" class="form-control" placeholder="Notice title">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Category</label>
+                                    <select class="form-select">
+                                        <option>General</option>
+                                        <option>Important</option>
+                                        <option>Event</option>
+                                        <option>Internal</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Content</label>
+                                    <textarea class="form-control" rows="5" placeholder="Notice content"></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Audience</label>
+                                    <select class="form-select">
+                                        <option>All Users</option>
+                                        <option>Teachers Only</option>
+                                        <option>Parents Only</option>
+                                        <option>Students Only</option>
+                                    </select>
+                                </div>
+                                <button class="btn btn-primary w-100">Publish Notice</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Settings Page -->
+        <div class="page-content" id="settings">
+            <div class="container-fluid">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h1 class="h3 mb-0 text-gray-800">System Settings & Configurations</h1>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Grading System</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Min Score</th>
+                                                <th>Max Score</th>
+                                                <th>Grade</th>
+                                                <th>Points</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>80</td>
+                                                <td>100</td>
+                                                <td>A</td>
+                                                <td>12</td>
+                                            </tr>
+                                            <tr>
+                                                <td>75</td>
+                                                <td>79</td>
+                                                <td>A-</td>
+                                                <td>11</td>
+                                            </tr>
+                                            <tr>
+                                                <td>70</td>
+                                                <td>74</td>
+                                                <td>B+</td>
+                                                <td>10</td>
+                                            </tr>
+                                            <tr>
+                                                <td>65</td>
+                                                <td>69</td>
+                                                <td>B</td>
+                                                <td>9</td>
+                                            </tr>
+                                            <tr>
+                                                <td>60</td>
+                                                <td>64</td>
+                                                <td>B-</td>
+                                                <td>8</td>
+                                            </tr>
+                                            <tr>
+                                                <td>55</td>
+                                                <td>59</td>
+                                                <td>C+</td>
+                                                <td>7</td>
+                                            </tr>
+                                            <tr>
+                                                <td>50</td>
+                                                <td>54</td>
+                                                <td>C</td>
+                                                <td>6</td>
+                                            </tr>
+                                            <tr>
+                                                <td>45</td>
+                                                <td>49</td>
+                                                <td>C-</td>
+                                                <td>5</td>
+                                            </tr>
+                                            <tr>
+                                                <td>40</td>
+                                                <td>44</td>
+                                                <td>D+</td>
+                                                <td>4</td>
+                                            </tr>
+                                            <tr>
+                                                <td>35</td>
+                                                <td>39</td>
+                                                <td>D</td>
+                                                <td>3</td>
+                                            </tr>
+                                            <tr>
+                                                <td>0</td>
+                                                <td>34</td>
+                                                <td>E</td>
+                                                <td>2</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <button class="btn btn-primary mt-3"><i class="fas fa-edit me-1"></i> Edit Grading System</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">User Permissions</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label class="form-label">Role</label>
+                                    <select class="form-select">
+                                        <option>Academic Master</option>
+                                        <option>Teacher</option>
+                                        <option>Parent</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="manageStudents" checked>
+                                        <label class="form-check-label" for="manageStudents">
+                                            Manage Students
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="manageTeachers" checked>
+                                        <label class="form-check-label" for="manageTeachers">
+                                            Manage Teachers
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="submitResults">
+                                        <label class="form-check-label" for="submitResults">
+                                            Submit Results
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="viewReports">
+                                        <label class="form-check-label" for="viewReports">
+                                            View Reports
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="postNotices">
+                                        <label class="form-check-label" for="postNotices">
+                                            Post Notices
+                                        </label>
+                                    </div>
+                                </div>
+                                <button class="btn btn-primary w-100">Save Permissions</button>
+                            </div>
+                        </div>
+                        <div class="card mt-4">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">System Information</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Version:</span>
+                                    <strong>v2.3.1</strong>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Last Updated:</span>
+                                    <strong>October 1, 2023</strong>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>License:</span>
+                                    <strong>Active until Dec 31, 2024</strong>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span>Support:</span>
+                                    <strong>support@maritimesystem.edu</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Initialize charts
+        document.addEventListener('DOMContentLoaded', function() {
+            // Performance Chart
+            var ctx = document.getElementById('performanceChart').getContext('2d');
+            var performanceChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Form 1', 'Form 2', 'Form 3', 'Form 4'],
+                    datasets: [
+                        {
+                            label: 'Mathematics',
+                            data: [75, 78, 82, 80],
+                            backgroundColor: 'rgba(54, 162, 235, 0.7)'
+                        },
+                        {
+                            label: 'Science',
+                            data: [72, 76, 79, 84],
+                            backgroundColor: 'rgba(255, 99, 132, 0.7)'
+                        },
+                        {
+                            label: 'English',
+                            data: [80, 82, 85, 88],
+                            backgroundColor: 'rgba(75, 192, 192, 0.7)'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: 60,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'Average Score'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Class Performance Chart
+            var ctx2 = document.getElementById('classPerformanceChart').getContext('2d');
+            var classPerformanceChart = new Chart(ctx2, {
+                type: 'line',
+                data: {
+                    labels: ['Mathematics', 'English', 'Physics', 'Chemistry', 'Biology', 'History'],
+                    datasets: [{
+                        label: 'Form 3A Average Scores',
+                        data: [82, 85, 78, 75, 80, 72],
+                        fill: false,
+                        borderColor: 'rgb(75, 192, 192)',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: 60,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'Average Score'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Sidebar toggle functionality
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('mainContent');
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const overlay = document.getElementById('overlay');
+            
+            sidebarToggle.addEventListener('click', function() {
+                if (window.innerWidth < 992) {
+                    sidebar.classList.toggle('mobile-expanded');
+                    overlay.classList.toggle('active');
+                } else {
+                    sidebar.classList.toggle('collapsed');
+                    mainContent.classList.toggle('expanded');
+                }
+            });
+
+            overlay.addEventListener('click', function() {
+                sidebar.classList.remove('mobile-expanded');
+                overlay.classList.remove('active');
+            });
+
+            // Navigation between pages
+            const navLinks = document.querySelectorAll('.sidebar .nav-link');
+            const pageContents = document.querySelectorAll('.page-content');
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Remove active class from all links and contents
+                    navLinks.forEach(navLink => navLink.classList.remove('active'));
+                    pageContents.forEach(content => content.classList.remove('active'));
+                    
+                    // Add active class to clicked link
+                    this.classList.add('active');
+                    
+                    // Show corresponding page content
+                    const pageId = this.getAttribute('data-page');
+                    document.getElementById(pageId).classList.add('active');
+                    
+                    // On mobile, collapse sidebar after selection
+                    if (window.innerWidth < 992) {
+                        sidebar.classList.remove('mobile-expanded');
+                        overlay.classList.remove('active');
+                    }
+                });
+            });
+
+            // Handle window resize
+            window.addEventListener('resize', function() {
+                if (window.innerWidth < 992) {
+                    sidebar.classList.remove('collapsed');
+                    mainContent.classList.remove('expanded');
+                } else {
+                    sidebar.classList.remove('mobile-expanded');
+                    overlay.classList.remove('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
